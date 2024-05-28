@@ -9,7 +9,8 @@ public class UserMealWithExcess {
 
     private final int calories;
 
-    private final boolean excess;
+    private boolean excess;
+    private MealDayCounter mealDayCounter;
 
     public UserMealWithExcess(LocalDateTime dateTime, String description, int calories, boolean excess) {
         this.dateTime = dateTime;
@@ -25,6 +26,16 @@ public class UserMealWithExcess {
         this.excess = excess;
     }
 
+    public UserMealWithExcess(UserMeal meal, MealDayCounter mealDayCounter) {
+        this.mealDayCounter = mealDayCounter;
+        this.dateTime = meal.getDateTime();
+        this.description = meal.getDescription();
+        this.calories = meal.getCalories();
+    }
+
+    public void updateExcess() {
+        this.excess = mealDayCounter.isExcess();
+    }
 
     @Override
     public String toString() {
