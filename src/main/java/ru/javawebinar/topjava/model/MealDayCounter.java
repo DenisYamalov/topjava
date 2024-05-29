@@ -1,24 +1,25 @@
 package ru.javawebinar.topjava.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class MealDayCounter {
-    private final LocalDateTime dateTime;
+    private final LocalDate date;
     private final int caloriesPerDay;
     private int totalCalories;
     private boolean excess;
 
-    public MealDayCounter(int caloriesPerDay, LocalDateTime dateTime) {
+    public MealDayCounter(int caloriesPerDay, LocalDate date) {
         this.caloriesPerDay = caloriesPerDay;
-        this.dateTime = dateTime;
+        this.date = date;
     }
 
     public boolean isExcess() {
         return excess;
     }
 
-    public LocalDateTime getDateTime() {
-        return dateTime;
+    public LocalDate getDate() {
+        return date;
     }
 
     public void addCalories(int calories) {

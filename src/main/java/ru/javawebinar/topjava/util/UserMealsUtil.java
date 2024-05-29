@@ -59,15 +59,14 @@ public class UserMealsUtil {
                                                                      LocalTime endTime,
                                                                      int caloriesPerDay) {
         List<UserMealWithExcess> userMealWithExcesses = new ArrayList<>();
-        Map<LocalDateTime, MealDayCounter> counterMap = new HashMap<>();
+        Map<LocalDate, MealDayCounter> counterMap = new HashMap<>();
         for (UserMeal meal : meals) {
+            LocalDate mealDate = meal.getDate();
+            MealDayCounter dayCounter = counterMap.getOrDefault(mealDate, new MealDayCounter(caloriesPerDay,
+                    mealDate));
+            dayCounter.addCalories(meal.getCalories());
+            counterMap.put(mealDate, dayCounter);
             if (TimeUtil.isBetweenHalfOpen(meal.getTime(), startTime, endTime)) {
-                LocalDateTime mealDateTime = meal.getDateTime();
-                MealDayCounter dayCounter = counterMap.getOrDefault(mealDateTime, new MealDayCounter(caloriesPerDay,
-                        mealDateTime));
-                dayCounter.addCalories(meal.getCalories());
-                counterMap.put(mealDateTime, dayCounter);
-
                 UserMealWithExcess mealWithExcess = new UserMealWithExcess(meal, dayCounter);
                 mealWithExcess.updateExcess();
                 userMealWithExcesses.add(mealWithExcess);
