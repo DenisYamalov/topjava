@@ -1,7 +1,7 @@
 package ru.javawebinar.topjava.model;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class MealDayCounter {
     private final LocalDate date;
@@ -14,16 +14,36 @@ public class MealDayCounter {
         this.date = date;
     }
 
+    public MealDayCounter(int caloriesPerDay, LocalDate date, int totalCalories) {
+        this.caloriesPerDay = caloriesPerDay;
+        this.date = date;
+        this.totalCalories = totalCalories;
+    }
+
     public boolean isExcess() {
         return excess;
     }
 
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void addCalories(int calories) {
+    public MealDayCounter addCalories(int calories) {
         totalCalories += calories;
         excess = totalCalories > caloriesPerDay;
+        return this;
+    }
+
+    public int getTotalCalories() {
+        return totalCalories;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MealDayCounter)) return false;
+        MealDayCounter that = (MealDayCounter) o;
+        return Objects.equals(date, that.date);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(date);
     }
 }
