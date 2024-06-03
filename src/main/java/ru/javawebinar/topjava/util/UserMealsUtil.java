@@ -44,10 +44,6 @@ public class UserMealsUtil {
         System.out.println();
         System.out.println("Single stream:");
         System.out.println(filteredByStream(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000));
-
-        System.out.println();
-        System.out.println("Single streamMap:");
-        System.out.println(filteredByStreamMap(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000));
     }
 
     public static List<UserMealWithExcess> filteredByCycles(List<UserMeal> meals,
@@ -111,21 +107,7 @@ public class UserMealsUtil {
                         (dailyMealCaloriesCounter, dailyMealCaloriesCounter2) -> dailyMealCaloriesCounter.addCalories(dailyMealCaloriesCounter2.getTotalCalories()),
                         userMeal -> TimeUtil.isBetweenHalfOpen(userMeal.getTime(), startTime, endTime),
                         (dailyMealCaloriesCounter, userMeal) -> getUserMealWithExcess(userMeal, dailyMealCaloriesCounter)
-                ));
-    }
-
-    public static List<UserMealWithExcess> filteredByStreamMap(List<UserMeal> meals,
-                                                               LocalTime startTime,
-                                                               LocalTime endTime,
-                                                               int caloriesPerDay) {
-        return meals.stream()
-                .collect(groupingAndCounting(
-                        UserMeal::getDate,
-                        UserMeal::getCalories,
-                        Integer::sum,
-                        userMeal -> TimeUtil.isBetweenHalfOpen(userMeal.getTime(), startTime, endTime),
-                        (integer, userMeal) -> getUserMealWithExcess(userMeal, integer > caloriesPerDay)
-                ));
+                )).getValue();
     }
 
     private static UserMealWithExcess getUserMealWithExcess(UserMeal meal, boolean excess) {
@@ -136,18 +118,18 @@ public class UserMealsUtil {
         return new UserMealWithExcess(meal.getDateTime(), meal.getDescription(), meal.getCalories(), dailyMealCaloriesCounter);
     }
 
-    private static <T, U, M, K> Collector<T, ?, List<U>> groupingAndCounting(Function<? super T, K> dateMapper,
-                                                                             Function<? super T, M> keyMapper,
-                                                                             BiFunction<M, M, M> counter,
-                                                                             Predicate<? super T> filter,
-                                                                             BiFunction<M, ? super T, ? extends U> valueMapper) {
-        BiConsumer<Map.Entry<Map<K, M>, List<T>>, T> accumulator = (mapListEntry, t) -> {
+    private static <T, U, M, K> Collector<T, ?, Map.Entry<Map<K, M>, List<U>>> groupingAndCounting(Function<? super T, K> dateMapper,
+                                                                                                   Function<? super T, M> keyMapper,
+                                                                                                   BiFunction<M, M, M> counter,
+                                                                                                   Predicate<? super T> filter,
+                                                                                                   BiFunction<M, ? super T, ? extends U> valueMapper) {
+        BiConsumer<Map.Entry<Map<K, M>, List<U>>, T> accumulator = (mapListEntry, t) -> {
             K date = Objects.requireNonNull(dateMapper.apply(t), "element cannot be mapped to a null key");
             Map<K, M> keyMap = mapListEntry.getKey();
             M valueToCompute = keyMapper.apply(t);
-            keyMap.compute(date, (k, m) -> m == null ? valueToCompute : counter.apply(m, valueToCompute));
+            M computed = keyMap.compute(date, (k, m) -> m == null ? valueToCompute : counter.apply(m, valueToCompute));
             if (filter.test(t)) {
-                mapListEntry.getValue().add(t);
+                mapListEntry.getValue().add(valueMapper.apply(computed, t));
             }
         };
         return Collector.of(
@@ -156,16 +138,7 @@ public class UserMealsUtil {
                 accumulator,
                 (s1, s2) -> {
                     throw new UnsupportedOperationException();
-                },
-                mapListEntry -> {
-                    List<U> resultList = new ArrayList<>();
-                    Map<K, M> keyMap = mapListEntry.getKey();
-                    List<T> valueList = mapListEntry.getValue();
-                    for (T value : valueList) {
-                        M key = keyMap.get(dateMapper.apply(value));
-                        resultList.add(valueMapper.apply(key, value));
-                    }
-                    return resultList;
-                });
+                }
+        );
     }
 }

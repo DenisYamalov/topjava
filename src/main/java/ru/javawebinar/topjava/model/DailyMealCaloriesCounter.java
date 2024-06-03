@@ -46,4 +46,14 @@ public class DailyMealCaloriesCounter {
     public int hashCode() {
         return Objects.hashCode(date);
     }
+
+    @Override
+    public String toString() {
+        return "DailyMealCaloriesCounter{" +
+                "date=" + date +
+                ", caloriesPerDay=" + caloriesPerDay +
+                ", totalCalories=" + totalCalories +
+                ", excess=" + excess +
+                '}';
+    }
 }
