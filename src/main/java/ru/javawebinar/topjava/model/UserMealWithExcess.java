@@ -6,18 +6,18 @@ public class UserMealWithExcess {
     private final LocalDateTime dateTime;
     private final String description;
     private final int calories;
-    private final MealDayCounter mealDayCounter;
+    private final DailyMealCaloriesCounter dailyMealCaloriesCounter;
 
     public UserMealWithExcess(LocalDateTime dateTime, String description, int calories, boolean excess) {
-        this(dateTime,description,calories,new MealDayCounter(excess?0:calories+1, dateTime.toLocalDate()));
-        mealDayCounter.addCalories(calories);
+        this(dateTime, description, calories, new DailyMealCaloriesCounter(excess ? 0 : calories + 1, dateTime.toLocalDate()));
+        dailyMealCaloriesCounter.addCalories(calories);
     }
 
-    public UserMealWithExcess(LocalDateTime dateTime, String description, int calories, MealDayCounter mealDayCounter) {
+    public UserMealWithExcess(LocalDateTime dateTime, String description, int calories, DailyMealCaloriesCounter dailyMealCaloriesCounter) {
         this.calories = calories;
         this.dateTime = dateTime;
         this.description = description;
-        this.mealDayCounter = mealDayCounter;
+        this.dailyMealCaloriesCounter = dailyMealCaloriesCounter;
     }
 
     @Override
@@ -26,7 +26,7 @@ public class UserMealWithExcess {
                 "dateTime=" + dateTime +
                 ", description='" + description + '\'' +
                 ", calories=" + calories +
-                ", excess=" + mealDayCounter.isExcess() +
+                ", excess=" + dailyMealCaloriesCounter.isExcess() +
                 '}';
     }
 }

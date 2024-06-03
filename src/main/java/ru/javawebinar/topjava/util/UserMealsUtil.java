@@ -1,6 +1,6 @@
 package ru.javawebinar.topjava.util;
 
-import ru.javawebinar.topjava.model.MealDayCounter;
+import ru.javawebinar.topjava.model.DailyMealCaloriesCounter;
 import ru.javawebinar.topjava.model.UserMeal;
 import ru.javawebinar.topjava.model.UserMealWithExcess;
 
@@ -74,14 +74,14 @@ public class UserMealsUtil {
                                                            LocalTime endTime,
                                                            int caloriesPerDay) {
         List<UserMealWithExcess> userMealWithExcesses = new ArrayList<>();
-        Map<LocalDate, MealDayCounter> counterMap = new HashMap<>();
+        Map<LocalDate, DailyMealCaloriesCounter> counterMap = new HashMap<>();
         for (UserMeal meal : meals) {
             LocalDate mealDate = meal.getDate();
-            MealDayCounter dayCounter = counterMap.getOrDefault(mealDate, new MealDayCounter(caloriesPerDay, mealDate));
-            dayCounter.addCalories(meal.getCalories());
-            counterMap.putIfAbsent(mealDate, dayCounter);
+            DailyMealCaloriesCounter dailyMealCaloriesCounter = counterMap.computeIfAbsent(mealDate, localDate -> new DailyMealCaloriesCounter(caloriesPerDay, mealDate));
+            dailyMealCaloriesCounter.addCalories(meal.getCalories());
+            counterMap.putIfAbsent(mealDate, dailyMealCaloriesCounter);
             if (TimeUtil.isBetweenHalfOpen(meal.getTime(), startTime, endTime)) {
-                UserMealWithExcess mealWithExcess = getUserMealWithExcess(meal, dayCounter);
+                UserMealWithExcess mealWithExcess = getUserMealWithExcess(meal, dailyMealCaloriesCounter);
                 userMealWithExcesses.add(mealWithExcess);
             }
         }
@@ -107,23 +107,24 @@ public class UserMealsUtil {
         return meals.stream()
                 .collect(groupingAndCounting(
                         UserMeal::getDate,
-                        userMeal -> new MealDayCounter(caloriesPerDay, userMeal.getDate(), userMeal.getCalories()),
-                        (mealDayCounter, mealDayCounter2) -> mealDayCounter.addCalories(mealDayCounter2.getTotalCalories()),
+                        userMeal -> new DailyMealCaloriesCounter(caloriesPerDay, userMeal.getDate(), userMeal.getCalories()),
+                        (dailyMealCaloriesCounter, dailyMealCaloriesCounter2) -> dailyMealCaloriesCounter.addCalories(dailyMealCaloriesCounter2.getTotalCalories()),
                         userMeal -> TimeUtil.isBetweenHalfOpen(userMeal.getTime(), startTime, endTime),
-                        (mealDayCounter, userMeal) -> getUserMealWithExcess(userMeal, mealDayCounter)
+                        (dailyMealCaloriesCounter, userMeal) -> getUserMealWithExcess(userMeal, dailyMealCaloriesCounter)
                 ));
     }
+
     public static List<UserMealWithExcess> filteredByStreamMap(List<UserMeal> meals,
-                                                            LocalTime startTime,
-                                                            LocalTime endTime,
-                                                            int caloriesPerDay) {
+                                                               LocalTime startTime,
+                                                               LocalTime endTime,
+                                                               int caloriesPerDay) {
         return meals.stream()
                 .collect(groupingAndCounting(
                         UserMeal::getDate,
                         UserMeal::getCalories,
                         Integer::sum,
                         userMeal -> TimeUtil.isBetweenHalfOpen(userMeal.getTime(), startTime, endTime),
-                        (integer, userMeal) -> getUserMealWithExcess(userMeal,integer>caloriesPerDay)
+                        (integer, userMeal) -> getUserMealWithExcess(userMeal, integer > caloriesPerDay)
                 ));
     }
 
@@ -131,8 +132,8 @@ public class UserMealsUtil {
         return new UserMealWithExcess(meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
     }
 
-    private static UserMealWithExcess getUserMealWithExcess(UserMeal meal, MealDayCounter mealDayCounter) {
-        return new UserMealWithExcess(meal.getDateTime(), meal.getDescription(), meal.getCalories(), mealDayCounter);
+    private static UserMealWithExcess getUserMealWithExcess(UserMeal meal, DailyMealCaloriesCounter dailyMealCaloriesCounter) {
+        return new UserMealWithExcess(meal.getDateTime(), meal.getDescription(), meal.getCalories(), dailyMealCaloriesCounter);
     }
 
     private static <T, U, M, K> Collector<T, ?, List<U>> groupingAndCounting(Function<? super T, K> dateMapper,
@@ -144,18 +145,17 @@ public class UserMealsUtil {
             K date = Objects.requireNonNull(dateMapper.apply(t), "element cannot be mapped to a null key");
             Map<K, M> keyMap = mapListEntry.getKey();
             M valueToCompute = keyMapper.apply(t);
-            keyMap.computeIfPresent(date, (k, m) -> counter.apply(m, valueToCompute));
-            keyMap.putIfAbsent(date, valueToCompute);
-            mapListEntry.getValue().add(t);
+            keyMap.compute(date, (k, m) -> m == null ? valueToCompute : counter.apply(m, valueToCompute));
+            if (filter.test(t)) {
+                mapListEntry.getValue().add(t);
+            }
         };
         return Collector.of(
                 () -> new AbstractMap.SimpleImmutableEntry<>(
-                        new HashMap<>(), new LinkedList<>()),
+                        new HashMap<>(), new ArrayList<>()),
                 accumulator,
                 (s1, s2) -> {
-                    s1.getValue().addAll(s2.getValue());
-                    s2.getKey().forEach((k, m) -> s1.getKey().merge(k, m, counter));
-                    return s1;
+                    throw new UnsupportedOperationException();
                 },
                 mapListEntry -> {
                     List<U> resultList = new ArrayList<>();
@@ -163,9 +163,7 @@ public class UserMealsUtil {
                     List<T> valueList = mapListEntry.getValue();
                     for (T value : valueList) {
                         M key = keyMap.get(dateMapper.apply(value));
-                        if (filter.test(value)) {
-                            resultList.add(valueMapper.apply(key, value));
-                        }
+                        resultList.add(valueMapper.apply(key, value));
                     }
                     return resultList;
                 });
