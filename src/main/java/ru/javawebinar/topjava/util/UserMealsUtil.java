@@ -9,10 +9,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Month;
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -73,9 +69,9 @@ public class UserMealsUtil {
         Map<LocalDate, DailyMealCaloriesCounter> counterMap = new HashMap<>();
         for (UserMeal meal : meals) {
             LocalDate mealDate = meal.getDate();
-            DailyMealCaloriesCounter dailyMealCaloriesCounter = counterMap.computeIfAbsent(mealDate, localDate -> new DailyMealCaloriesCounter(caloriesPerDay, mealDate));
+            DailyMealCaloriesCounter dailyMealCaloriesCounter = counterMap.computeIfAbsent(mealDate,
+                    localDate -> new DailyMealCaloriesCounter(caloriesPerDay, mealDate));
             dailyMealCaloriesCounter.addCalories(meal.getCalories());
-            counterMap.putIfAbsent(mealDate, dailyMealCaloriesCounter);
             if (TimeUtil.isBetweenHalfOpen(meal.getTime(), startTime, endTime)) {
                 UserMealWithExcess mealWithExcess = getUserMealWithExcess(meal, dailyMealCaloriesCounter);
                 userMealWithExcesses.add(mealWithExcess);
@@ -101,12 +97,23 @@ public class UserMealsUtil {
                                                             LocalTime endTime,
                                                             int caloriesPerDay) {
         return meals.stream()
-                .collect(groupingAndCounting(
-                        UserMeal::getDate,
-                        userMeal -> new DailyMealCaloriesCounter(caloriesPerDay, userMeal.getDate(), userMeal.getCalories()),
-                        (dailyMealCaloriesCounter, dailyMealCaloriesCounter2) -> dailyMealCaloriesCounter.addCalories(dailyMealCaloriesCounter2.getTotalCalories()),
-                        userMeal -> TimeUtil.isBetweenHalfOpen(userMeal.getTime(), startTime, endTime),
-                        (dailyMealCaloriesCounter, userMeal) -> getUserMealWithExcess(userMeal, dailyMealCaloriesCounter)
+                .collect(Collector.of(
+                        () -> new AbstractMap.SimpleImmutableEntry<>(
+                                new HashMap<LocalDate, DailyMealCaloriesCounter>(), new ArrayList<UserMealWithExcess>()),
+                        (mapListEntry, meal) -> {
+                            LocalDate mealDate = meal.getDate();
+                            DailyMealCaloriesCounter dailyMealCaloriesCounter =
+                                    mapListEntry.getKey()
+                                            .computeIfAbsent(mealDate,
+                                                    d -> new DailyMealCaloriesCounter(caloriesPerDay, mealDate, 0));
+                            dailyMealCaloriesCounter.addCalories(meal.getCalories());
+                            if (TimeUtil.isBetweenHalfOpen(meal.getTime(), startTime, endTime)) {
+                                mapListEntry.getValue().add(getUserMealWithExcess(meal, dailyMealCaloriesCounter));
+                            }
+                        },
+                        (s1, s2) -> {
+                            throw new UnsupportedOperationException();
+                        }
                 )).getValue();
     }
 
@@ -114,31 +121,12 @@ public class UserMealsUtil {
         return new UserMealWithExcess(meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
     }
 
-    private static UserMealWithExcess getUserMealWithExcess(UserMeal meal, DailyMealCaloriesCounter dailyMealCaloriesCounter) {
-        return new UserMealWithExcess(meal.getDateTime(), meal.getDescription(), meal.getCalories(), dailyMealCaloriesCounter);
+    private static UserMealWithExcess getUserMealWithExcess(UserMeal meal,
+                                                            DailyMealCaloriesCounter dailyMealCaloriesCounter) {
+        return new UserMealWithExcess(meal.getDateTime(),
+                meal.getDescription(),
+                meal.getCalories(),
+                dailyMealCaloriesCounter);
     }
 
-    private static <T, U, M, K> Collector<T, ?, Map.Entry<Map<K, M>, List<U>>> groupingAndCounting(Function<? super T, K> dateMapper,
-                                                                                                   Function<? super T, M> keyMapper,
-                                                                                                   BiFunction<M, M, M> counter,
-                                                                                                   Predicate<? super T> filter,
-                                                                                                   BiFunction<M, ? super T, ? extends U> valueMapper) {
-        BiConsumer<Map.Entry<Map<K, M>, List<U>>, T> accumulator = (mapListEntry, t) -> {
-            K date = Objects.requireNonNull(dateMapper.apply(t), "element cannot be mapped to a null key");
-            Map<K, M> keyMap = mapListEntry.getKey();
-            M valueToCompute = keyMapper.apply(t);
-            M computed = keyMap.compute(date, (k, m) -> m == null ? valueToCompute : counter.apply(m, valueToCompute));
-            if (filter.test(t)) {
-                mapListEntry.getValue().add(valueMapper.apply(computed, t));
-            }
-        };
-        return Collector.of(
-                () -> new AbstractMap.SimpleImmutableEntry<>(
-                        new HashMap<>(), new ArrayList<>()),
-                accumulator,
-                (s1, s2) -> {
-                    throw new UnsupportedOperationException();
-                }
-        );
-    }
 }
