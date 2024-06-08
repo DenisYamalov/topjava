@@ -12,13 +12,13 @@
 <hr>
 <h2>Meals</h2>
 
+<p><a href="meals?action=insert">Add meal</a></p>
 <table>
     <tr>
-        <td>Date</td>
-        <td>Description</td>
-        <td>Calories</td>
-        <td></td>
-        <td></td>
+        <th>Date</th>
+        <th>Description</th>
+        <th>Calories</th>
+        <th colspan="2">Action</th>
     </tr>
     <jsp:useBean id="meals" scope="request" type="java.util.List<ru.javawebinar.topjava.model.MealTo>"/>
     <c:forEach var="meal" items="${meals}">
@@ -26,8 +26,8 @@
             <td>${TimeUtil.format(meal.dateTime)}</td>
             <td>${meal.description}</td>
             <td>${meal.calories}</td>
-            <td>Update</td>
-            <td>Delete</td>
+            <td><a href="meals?action=edit&mealId=<c:out value="${meal.id}"/>">Update</a></td>
+            <td><a href="meals?action=delete&mealId=<c:out value="${meal.id}"/>">Delete</a></td>
         </tr>
     </c:forEach>
 </table>
