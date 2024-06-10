@@ -5,10 +5,7 @@ import ru.javawebinar.topjava.model.Meal;
 import java.util.List;
 
 public interface MealDao {
-
-    void clear();
-
-    void save(Meal meal);
+    Meal createOrUpdate(Meal meal);
 
     Meal getById(int id);
 
@@ -16,8 +13,4 @@ public interface MealDao {
 
     List<Meal> getAll();
 
-    int size();
-
-    void update(Meal meal);
-    boolean isExist(int id);
 }

@@ -2,9 +2,8 @@ package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
 import ru.javawebinar.topjava.dao.MealDao;
-import ru.javawebinar.topjava.dao.MealDaoDefault;
+import ru.javawebinar.topjava.dao.MealMemoryDao;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.util.MealIdCounter;
 import ru.javawebinar.topjava.util.MealsUtil;
 
 import javax.servlet.ServletException;
@@ -20,12 +19,14 @@ public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(MealServlet.class);
     private static final String INSERT_OR_EDIT = "/meal.jsp";
     private static final String LIST_MEALS = "/meals.jsp";
-    private final MealDao mealDao;
+    private MealDao mealDao;
 
-    public MealServlet() {
-        mealDao = MealDaoDefault.getInstance();
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        mealDao = new MealMemoryDao();
         //FOR TESTING ONLY
-        MealsUtil.meals.forEach(mealDao::save);
+        MealsUtil.meals.forEach(mealDao::createOrUpdate);
     }
 
     @Override
@@ -40,7 +41,7 @@ public class MealServlet extends HttpServlet {
         }
         switch (action) {
             case "insert":
-                meal = new Meal(MealIdCounter.getId(), LocalDateTime.now(), "", 0);
+                meal = new Meal(0, LocalDateTime.now(), "", 0);
             case "edit":
                 forward = INSERT_OR_EDIT;
                 if (meal == null) {
@@ -70,11 +71,7 @@ public class MealServlet extends HttpServlet {
         String description = req.getParameter("description");
         int calories = Integer.parseInt(req.getParameter("calories"));
         Meal meal = new Meal(id, date, description, calories);
-        if (mealDao.isExist(id)) {
-            mealDao.update(meal);
-        } else {
-            mealDao.save(meal);
-        }
+        mealDao.createOrUpdate(meal);
         resp.sendRedirect("meals");
     }
 }
