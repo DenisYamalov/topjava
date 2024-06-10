@@ -52,10 +52,12 @@ public class MealServlet extends HttpServlet {
             case "delete":
                 int mealId = Integer.parseInt(req.getParameter("mealId"));
                 mealDao.delete(mealId);
-                forward = LIST_MEALS;
+                resp.sendRedirect(req.getRequestURI());
+                return;
             case "listMeals":
+            default:
                 req.setAttribute("meals", MealsUtil.mapToList(mealDao.getAll(), MealsUtil.CALORIES_PER_DAY));
-                break;
+
         }
         req.getRequestDispatcher(forward).forward(req, resp);
     }

@@ -14,7 +14,7 @@
     <dl>
         <dt>Date Time</dt>
         <dd>
-            <input type="datetime-local" name="dateTime" value="${meal.dateTime}">
+            <input type="datetime-local" name="dateTime" value="${meal.dateTime}" step="60">
         </dd>
     </dl>
     <dl>
