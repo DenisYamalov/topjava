@@ -2,7 +2,7 @@ package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
 import ru.javawebinar.topjava.dao.MealDao;
-import ru.javawebinar.topjava.dao.MealMemoryDao;
+import ru.javawebinar.topjava.dao.MemoryMealDao;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.MealsUtil;
 
@@ -22,16 +22,15 @@ public class MealServlet extends HttpServlet {
     private MealDao mealDao;
 
     @Override
-    public void init() throws ServletException {
-        super.init();
-        mealDao = new MealMemoryDao();
+    public void init() {
+        mealDao = new MemoryMealDao();
         //FOR TESTING ONLY
-        MealsUtil.meals.forEach(mealDao::createOrUpdate);
+        MealsUtil.meals.forEach(mealDao::save);
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String forward = "";
+        String forward;
         Meal meal = null;
         String action = req.getParameter("action");
         if (action == null) {
@@ -58,7 +57,8 @@ public class MealServlet extends HttpServlet {
             case "listMeals":
             default:
                 req.setAttribute("meals", MealsUtil.mapToList(mealDao.getAll(), MealsUtil.CALORIES_PER_DAY));
-
+                resp.sendRedirect(req.getRequestURI());
+                return;
         }
         req.getRequestDispatcher(forward).forward(req, resp);
     }
@@ -71,7 +71,7 @@ public class MealServlet extends HttpServlet {
         String description = req.getParameter("description");
         int calories = Integer.parseInt(req.getParameter("calories"));
         Meal meal = new Meal(id, date, description, calories);
-        mealDao.createOrUpdate(meal);
+        mealDao.save(meal);
         resp.sendRedirect("meals");
     }
 }

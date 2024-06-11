@@ -8,23 +8,23 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MealMemoryDao implements MealDao {
+public class MemoryMealDao implements MealDao {
     private static final AtomicInteger counter = new AtomicInteger(1);
-
-    private static int getId() {
-        return counter.incrementAndGet();
-    }
 
     private static final ConcurrentMap<Integer, Meal> meaMap = new ConcurrentHashMap<>();
 
     @Override
-    public Meal createOrUpdate(Meal meal) {
+    public Meal save(Meal meal) {
         if (meal.getId() == 0) {
             int newId = getId();
             meal = new Meal(newId, meal.getDateTime(), meal.getDescription(), meal.getCalories());
         }
         meaMap.put(meal.getId(), meal);
         return meal;
+    }
+
+    private static int getId() {
+        return counter.incrementAndGet();
     }
 
     @Override
