@@ -19,7 +19,7 @@ public class MemoryMealDao implements MealDao {
             int newId = getId();
             meal = new Meal(newId, meal.getDateTime(), meal.getDescription(), meal.getCalories());
         }
-        return meaMap.merge(meal.getId(), meal,(meal1, meal2) -> meal2);
+        return meaMap.merge(meal.getId(), meal, (meal1, meal2) -> meal2);
     }
 
     private static int getId() {
@@ -40,5 +40,4 @@ public class MemoryMealDao implements MealDao {
     public List<Meal> getAll() {
         return new ArrayList<>(meaMap.values());
     }
-
 }
