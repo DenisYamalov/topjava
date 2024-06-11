@@ -40,7 +40,7 @@ public class MealServlet extends HttpServlet {
         }
         switch (action) {
             case "insert":
-                meal = new Meal(0, LocalDateTime.now(), "", 0);
+                meal = new Meal(null, LocalDateTime.now(), "", 0);
             case "edit":
                 forward = INSERT_OR_EDIT;
                 if (meal == null) {
@@ -66,12 +66,16 @@ public class MealServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         req.setCharacterEncoding("UTF-8");
-        int id = Integer.parseInt(req.getParameter("id"));
+        Integer id = null;
+        String reqParameterId = req.getParameter("id");
+        if (!reqParameterId.isEmpty()) {
+            id = Integer.parseInt(reqParameterId);
+        }
         LocalDateTime date = LocalDateTime.parse(req.getParameter("dateTime"));
         String description = req.getParameter("description");
         int calories = Integer.parseInt(req.getParameter("calories"));
         Meal meal = new Meal(id, date, description, calories);
-        mealDao.save(meal);
+        log.info("Saved meal: {}", mealDao.save(meal));
         resp.sendRedirect("meals");
     }
 }

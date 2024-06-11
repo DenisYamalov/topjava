@@ -9,18 +9,17 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MemoryMealDao implements MealDao {
-    private static final AtomicInteger counter = new AtomicInteger(1);
+    private static final AtomicInteger counter = new AtomicInteger(0);
 
     private static final ConcurrentMap<Integer, Meal> meaMap = new ConcurrentHashMap<>();
 
     @Override
     public Meal save(Meal meal) {
-        if (meal.getId() == 0) {
+        if (meal.getId() == null || !meaMap.containsKey(meal.getId())) {
             int newId = getId();
             meal = new Meal(newId, meal.getDateTime(), meal.getDescription(), meal.getCalories());
         }
-        meaMap.put(meal.getId(), meal);
-        return meal;
+        return meaMap.merge(meal.getId(), meal,(meal1, meal2) -> meal2);
     }
 
     private static int getId() {
