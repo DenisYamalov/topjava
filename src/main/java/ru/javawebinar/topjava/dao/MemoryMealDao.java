@@ -1,6 +1,7 @@
 package ru.javawebinar.topjava.dao;
 
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.util.MealsUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,11 @@ public class MemoryMealDao implements MealDao {
     private static final AtomicInteger counter = new AtomicInteger(0);
 
     private static final ConcurrentMap<Integer, Meal> meaMap = new ConcurrentHashMap<>();
+
+    public MemoryMealDao() {
+        //FOR TESTING ONLY
+        MealsUtil.meals.forEach(this::save);
+    }
 
     @Override
     public Meal save(Meal meal) {

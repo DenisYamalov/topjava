@@ -24,23 +24,20 @@ public class MealServlet extends HttpServlet {
     @Override
     public void init() {
         mealDao = new MemoryMealDao();
-        //FOR TESTING ONLY
-        MealsUtil.meals.forEach(mealDao::save);
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String forward;
-        Meal meal = null;
         String action = req.getParameter("action");
         if (action == null) {
-            req.setAttribute("meals", MealsUtil.mapToList(mealDao.getAll(), MealsUtil.CALORIES_PER_DAY));
-            req.getRequestDispatcher(LIST_MEALS).forward(req, resp);
-            return;
+            action = "";
         }
+        String forward;
+        Meal meal = null;
         switch (action) {
             case "insert":
                 meal = new Meal(null, LocalDateTime.now(), "", 0);
+                log.info("Inserting meal");
             case "edit":
                 forward = INSERT_OR_EDIT;
                 if (meal == null) {
@@ -48,16 +45,17 @@ public class MealServlet extends HttpServlet {
                     meal = mealDao.getById(id);
                 }
                 req.setAttribute("meal", meal);
+                log.info("Editing meal: {}", meal);
                 break;
             case "delete":
                 int mealId = Integer.parseInt(req.getParameter("mealId"));
                 mealDao.delete(mealId);
+                log.info("Meal id = {} removed", mealId);
                 resp.sendRedirect(req.getRequestURI());
                 return;
-            case "listMeals":
             default:
                 req.setAttribute("meals", MealsUtil.mapToList(mealDao.getAll(), MealsUtil.CALORIES_PER_DAY));
-                resp.sendRedirect(req.getRequestURI());
+                req.getRequestDispatcher(LIST_MEALS).forward(req, resp);
                 return;
         }
         req.getRequestDispatcher(forward).forward(req, resp);
@@ -70,12 +68,16 @@ public class MealServlet extends HttpServlet {
         String reqParameterId = req.getParameter("id");
         if (!reqParameterId.isEmpty()) {
             id = Integer.parseInt(reqParameterId);
+            log.info("Updating meal id = {}", id);
+        } else {
+            log.info("New meal creating");
         }
         LocalDateTime date = LocalDateTime.parse(req.getParameter("dateTime"));
         String description = req.getParameter("description");
         int calories = Integer.parseInt(req.getParameter("calories"));
         Meal meal = new Meal(id, date, description, calories);
-        log.info("Saved meal: {}", mealDao.save(meal));
+        Meal savedMeal = mealDao.save(meal);
+        log.info("Saved meal: {}", savedMeal);
         resp.sendRedirect("meals");
     }
 }
