@@ -1,8 +1,8 @@
 package ru.javawebinar.topjava.util;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class DateTimeUtil {
@@ -12,8 +12,8 @@ public class DateTimeUtil {
         return !lt.isBefore(startTime) && lt.isBefore(endTime);
     }
 
-    public static boolean isBetweenHalfOpen(LocalDate date, LocalDate startDate, LocalDate endDate) {
-        return !date.isBefore(startDate) && date.isBefore(endDate);
+    public static <T extends ChronoLocalDate> boolean isBetweenHalfOpen(T check, T start, T end) {
+        return check.compareTo(start) >= 0 && check.compareTo(end) <= 0;
     }
 
     public static String toString(LocalDateTime ldt) {

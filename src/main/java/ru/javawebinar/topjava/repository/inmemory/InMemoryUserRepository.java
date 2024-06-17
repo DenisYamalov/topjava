@@ -28,11 +28,10 @@ public class InMemoryUserRepository implements UserRepository {
     @Override
     public User save(User user) {
         log.info("save {}", user);
-        if (user.isNew()) {
+        if (user.isNew() || !repository.containsKey(user.getId())) {
             user.setId(counter.incrementAndGet());
             repository.put(user.getId(), user);
         }
-        // handle case: update, but not present in storage
         return repository.computeIfPresent(user.getId(), (id, olduser) -> user);
     }
 
