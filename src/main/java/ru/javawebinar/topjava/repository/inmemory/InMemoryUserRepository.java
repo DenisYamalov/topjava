@@ -22,17 +22,19 @@ public class InMemoryUserRepository implements UserRepository {
     @Override
     public boolean delete(int id) {
         log.info("delete {}", id);
-        return repository.get(id) == null ? false : repository.remove(id) != null;
+        return repository.remove(id) != null;
     }
 
     @Override
     public User save(User user) {
         log.info("save {}", user);
-        if (user.isNew() || !repository.containsKey(user.getId())) {
+        if (user.isNew()) {
             user.setId(counter.incrementAndGet());
             repository.put(user.getId(), user);
+            return user;
         }
-        return repository.computeIfPresent(user.getId(), (id, olduser) -> user);
+        return !repository.containsKey(user.getId()) ? null
+                : repository.compute(user.getId(), (integer, user1) -> user);
     }
 
     @Override
