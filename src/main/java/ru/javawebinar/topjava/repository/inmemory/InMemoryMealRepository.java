@@ -8,6 +8,7 @@ import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.web.SecurityUtil;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,8 @@ public class InMemoryMealRepository implements MealRepository {
             repository.put(meal.getId(), meal);
             return meal;
         }
-        return repository.computeIfPresent(meal.getId(), (id, oldMeal) -> meal);
+        return repository.computeIfPresent(meal.getId(),
+                (id, oldMeal) -> (oldMeal.getUserId().equals(userId))?meal:null);
     }
 
     @Override
@@ -62,14 +64,16 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public List<Meal> getFiltered(Integer userId, LocalDate startDate, LocalDate endDate) {
-        return filterByPredicate(userId, meal -> DateTimeUtil.isBetweenHalfOpen(meal.getDate(), startDate, endDate));
+        return filterByPredicate(userId, meal ->
+                DateTimeUtil.isBetweenHalfOpen(meal.getDateTime(), startDate.atStartOfDay(),
+                        endDate.atTime(LocalTime.MAX)));
     }
 
     private List<Meal> filterByPredicate(Integer userId, Predicate<Meal> predicate) {
         return repository.values().stream()
                 .filter(meal -> meal.getUserId().equals(userId))
                 .filter(predicate)
-                .sorted(Comparator.comparing(Meal::getDate).reversed())
+                .sorted(Comparator.comparing(Meal::getDateTime).reversed())
                 .collect(Collectors.toList());
     }
 }

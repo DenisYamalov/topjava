@@ -25,19 +25,19 @@
         <input type="hidden" name="action" value="filter">
         <dl>
             <dt>Start date (include)</dt>
-            <dd><input type="date" name="startDate"></dd>
+            <dd><input type="date" name="startDate" value="${param.startDate}"></dd>
         </dl>
         <dl>
             <dt>Start time (include)</dt>
-            <dd><input type="time" name="startTime"></dd>
+            <dd><input type="time" name="startTime" value="${param.startTime}"></dd>
         </dl>
         <dl>
             <dt>End date (exclude)</dt>
-            <dd><input type="date" name="endDate"></dd>
+            <dd><input type="date" name="endDate" value="${param.endDate}"></dd>
         </dl>
         <dl>
             <dt>End time (exclude)</dt>
-            <dd><input type="time" name="endTime"></dd>
+            <dd><input type="time" name="endTime" value="${param.endTime}"></dd>
         </dl>
         <button type="submit">Filter</button>
         <button onclick="window.history.back()" type="reset">Cancel</button>
