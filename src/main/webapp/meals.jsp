@@ -21,7 +21,7 @@
     <h3><a href="index.html">Home</a></h3>
     <hr/>
     <h2>Meals</h2>
-    <form method="get" action="meals">
+    <form method="post" action="meals">
         <input type="hidden" name="action" value="filter">
         <dl>
             <dt>Start date (include)</dt>
