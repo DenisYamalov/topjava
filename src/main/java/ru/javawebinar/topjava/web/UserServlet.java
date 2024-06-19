@@ -2,7 +2,6 @@ package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,11 +13,19 @@ public class UserServlet extends HttpServlet {
     private static final Logger log = getLogger(UserServlet.class);
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        log.debug("forward to users");
+    protected void doPost(HttpServletRequest request,
+                          HttpServletResponse response) throws IOException {
+        request.setCharacterEncoding("UTF-8");
         int userId = Integer.parseInt(request.getParameter("userId"));
         SecurityUtil.setUserId(userId);
         log.info("User id = {}", userId);
         response.sendRedirect("meals");
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response) throws IOException {
+        log.debug("forward to users");
+        response.sendRedirect("users.jsp");
     }
 }

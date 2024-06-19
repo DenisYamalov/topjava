@@ -33,8 +33,7 @@ public class InMemoryUserRepository implements UserRepository {
             repository.put(user.getId(), user);
             return user;
         }
-        return !repository.containsKey(user.getId()) ? null
-                : repository.compute(user.getId(), (id, user1) -> user);
+        return repository.computeIfPresent(user.getId(), (id, user1) -> user);
     }
 
     @Override

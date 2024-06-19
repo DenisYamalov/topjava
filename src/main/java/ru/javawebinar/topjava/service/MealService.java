@@ -34,11 +34,11 @@ public class MealService {
         return repository.getAll(userId);
     }
 
-    public List<Meal> getFiltered(int userId, LocalDate startDate, LocalDate endDate) {
+    public List<Meal> getFiltered(LocalDate startDate, LocalDate endDate, int userId) {
         return repository.getFiltered(userId, startDate, endDate);
     }
 
-    public void update(int userId, Meal meal) {
+    public void update(Meal meal, int userId) {
         checkNotFoundWithId(repository.save(meal, userId), meal.getId());
     }
 }

@@ -33,33 +33,30 @@ public class InMemoryMealRepository implements MealRepository {
             repository.put(meal.getId(), meal);
             return meal;
         }
-        Meal oldMeal = repository.get(meal.getId());
-        if (oldMeal != null) {
-            if (oldMeal.getUserId().equals(userId)) {
+        Meal computed = repository.computeIfPresent(meal.getId(), (id, oldMeal) -> {
+            if (isOwnerId(oldMeal, userId)) {
                 meal.setUserId(userId);
-                repository.put(meal.getId(), meal);
                 return meal;
             }
-        }
-        return null;
+            return oldMeal;
+        });
+        return isOwnerId(computed, userId) ? computed : null;
     }
 
     @Override
     public boolean delete(int id, int userId) {
         Meal meal = repository.get(id);
-        if (meal != null && meal.getUserId().equals(userId)) {
-            return repository.remove(id) != null;
-        }
-        return false;
+        return isOwnerId(meal, userId) && repository.remove(id) != null;
+    }
+
+    private boolean isOwnerId(Meal meal, int userId) {
+        return meal != null && meal.getUserId().equals(userId);
     }
 
     @Override
     public Meal get(int id, int userId) {
         Meal meal = repository.get(id);
-        if (meal != null && meal.getUserId().equals(userId)) {
-            return meal;
-        }
-        return null;
+        return isOwnerId(meal, userId) ? meal : null;
     }
 
     @Override
@@ -70,7 +67,7 @@ public class InMemoryMealRepository implements MealRepository {
     @Override
     public List<Meal> getFiltered(int userId, LocalDate startDate, LocalDate endDate) {
         return filterByPredicate(userId, meal ->
-                DateTimeUtil.isBetweenHalfOpen(meal.getDateTime(), startDate.atStartOfDay(),
+                DateTimeUtil.isBetweenHalfOpen(meal.getDate().atStartOfDay(), startDate.atStartOfDay(),
                                                endDate.atTime(LocalTime.MAX)));
     }
 
