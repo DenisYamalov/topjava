@@ -61,17 +61,17 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public List<Meal> getAll(int userId) {
-        return filterByPredicate(userId, meal -> true);
+        return filterByPredicate(meal -> true, userId);
     }
 
     @Override
-    public List<Meal> getFiltered(int userId, LocalDate startDate, LocalDate endDate) {
-        return filterByPredicate(userId, meal ->
+    public List<Meal> getFiltered(LocalDate startDate, LocalDate endDate, int userId) {
+        return filterByPredicate(meal ->
                 DateTimeUtil.isBetweenHalfOpen(meal.getDate().atStartOfDay(), startDate.atStartOfDay(),
-                                               endDate.atTime(LocalTime.MAX)));
+                                               endDate.atTime(LocalTime.MAX)), userId);
     }
 
-    private List<Meal> filterByPredicate(int userId, Predicate<Meal> predicate) {
+    private List<Meal> filterByPredicate(Predicate<Meal> predicate, int userId) {
         return repository.values().stream()
                 .filter(meal -> meal.getUserId().equals(userId))
                 .filter(predicate)
