@@ -49,14 +49,14 @@ public class InMemoryMealRepository implements MealRepository {
         return isOwnerId(meal, userId) && repository.remove(id) != null;
     }
 
-    private boolean isOwnerId(Meal meal, int userId) {
-        return meal != null && meal.getUserId().equals(userId);
-    }
-
     @Override
     public Meal get(int id, int userId) {
         Meal meal = repository.get(id);
         return isOwnerId(meal, userId) ? meal : null;
+    }
+
+    private boolean isOwnerId(Meal meal, int userId) {
+        return meal != null && meal.getUserId().equals(userId);
     }
 
     @Override
