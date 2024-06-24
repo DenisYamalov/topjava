@@ -60,7 +60,7 @@ public class MealServiceTest {
         //Meals list of 2020-01-30
         List<Meal> mealsBetweenDate = Arrays.asList(userMeal3, userMeal2, userMeal1);
         assertMatch(service.getBetweenInclusive(LocalDate.of(2020, 1, 30),
-                LocalDate.of(2020, 1, 30), user.getId()), mealsBetweenDate);
+                                                LocalDate.of(2020, 1, 30), user.getId()), mealsBetweenDate);
     }
 
     @Test
@@ -95,12 +95,18 @@ public class MealServiceTest {
 
     @Test
     public void duplicateMailCreate() {
-        assertThrows(DataAccessException.class, () -> service.create(userMeal1, user.getId()));
+        getDataAccessException(new Meal(userMeal1.getDateTime(),
+                                        userMeal1.getDescription(),
+                                        userMeal1.getCalories()), user.getId());
     }
 
     @Test
     public void duplicateDateTimeCreate() {
         Meal duplcateDateMeal = new Meal(userMeal1.getDateTime(), "Duplicate date-time meal", 100);
-        assertThrows(DataAccessException.class, () -> service.create(duplcateDateMeal, user.getId()));
+        getDataAccessException(duplcateDateMeal, user.getId());
+    }
+
+    private void getDataAccessException(Meal meal, int userId) {
+        assertThrows(DataAccessException.class, () -> service.create(meal, userId));
     }
 }
