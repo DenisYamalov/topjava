@@ -23,7 +23,8 @@ import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
 import static ru.javawebinar.topjava.UserTestData.USER_ID;
 
-@ContextConfiguration({"classpath:spring/spring-app.xml", "classpath:spring/jdbc-repo.xml", "classpath:spring/spring-db.xml"})
+@ContextConfiguration({"classpath:spring/spring-app.xml", "classpath:spring/jdbc-repo.xml", "classpath:spring/spring" +
+        "-db.xml"})
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
@@ -73,7 +74,7 @@ public class MealServiceTest {
         //Meals list of 2020-01-30
         List<Meal> mealsBetweenDate = Arrays.asList(userMeal3, userMeal2, userMeal1);
         assertMatch(service.getBetweenInclusive(LocalDate.of(2020, 1, 30),
-                LocalDate.of(2020, 1, 30), USER_ID), mealsBetweenDate);
+                                                LocalDate.of(2020, 1, 30), USER_ID), mealsBetweenDate);
     }
 
     @Test
@@ -84,8 +85,12 @@ public class MealServiceTest {
     @Test
     public void getAll() {
         List<Meal> all = service.getAll(USER_ID);
-        List<Meal> allAdmin = service.getAll(ADMIN_ID);
         assertMatch(all, userMeals);
+    }
+
+    @Test
+    public void getAllAdminMeal() {
+        List<Meal> allAdmin = service.getAll(ADMIN_ID);
         assertMatch(allAdmin, adminMeals);
     }
 
