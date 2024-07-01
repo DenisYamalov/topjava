@@ -61,7 +61,7 @@ public class MealServiceTest {
     private static void logInfo(Description description, String status, long nanos) {
         String testName = description.getMethodName();
         logger.info(String.format("Test %s %s, spent %d milliseconds",
-                testName, status, TimeUnit.NANOSECONDS.toMillis(nanos)));
+                                  testName, status, TimeUnit.NANOSECONDS.toMillis(nanos)));
     }
 
 
@@ -70,15 +70,9 @@ public class MealServiceTest {
 
     @Test
     public void delete() {
-//        final Logger log = getLogger();
-//        log.warning("Your test is showing!");
-//        log.info( name.getMethodName() + " is testing");
         service.delete(MEAL1_ID, USER_ID);
         assertThrows(NotFoundException.class, () -> service.get(MEAL1_ID, USER_ID));
     }
-//    private Logger getLogger(){
-//        return logger.getLogger();
-//    }
 
     @Test
     public void deleteNotFound() {
@@ -143,9 +137,9 @@ public class MealServiceTest {
     @Test
     public void getBetweenInclusive() {
         MEAL_MATCHER.assertMatch(service.getBetweenInclusive(
-                        LocalDate.of(2020, Month.JANUARY, 30),
-                        LocalDate.of(2020, Month.JANUARY, 30), USER_ID),
-                meal3, meal2, meal1);
+                                         LocalDate.of(2020, Month.JANUARY, 30),
+                                         LocalDate.of(2020, Month.JANUARY, 30), USER_ID),
+                                 meal3, meal2, meal1);
     }
 
     @Test
