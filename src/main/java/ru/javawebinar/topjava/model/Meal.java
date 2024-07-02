@@ -1,6 +1,10 @@
 package ru.javawebinar.topjava.model;
 
+import org.hibernate.validator.constraints.Length;
+
 import javax.persistence.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -20,10 +24,9 @@ import java.time.LocalTime;
         @NamedQuery(name = Meal.GET, query = "SELECT m FROM Meal m WHERE m.id=:id AND m.user.id=:user_id")
 })
 @Entity
-@Table(name = "meal",
-        uniqueConstraints = {@UniqueConstraint(name = "meal_unique_user_datetime_idx", columnNames = {"user_id",
-                "date_time"})
-        })
+@Table(name = "meal", uniqueConstraints = {@UniqueConstraint(name = "meal_unique_user_datetime_idx",
+        columnNames = {"user_id", "date_time"})
+})
 public class Meal extends AbstractBaseEntity {
 
     public static final String GET = "Meal.get";
@@ -38,13 +41,16 @@ public class Meal extends AbstractBaseEntity {
 
     @Column(name = "description", nullable = false)
     @NotBlank
+    @Length(min = 2, max = 120)
     private String description;
 
     @Column(name = "calories", nullable = false, columnDefinition = "INT NOT NULL")
+    @Min(10)
+    @Max(5000)
     private int calories;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     public Meal() {
