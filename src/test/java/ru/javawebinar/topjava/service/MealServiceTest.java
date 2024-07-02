@@ -50,7 +50,7 @@ public class MealServiceTest {
             String finished = String.format("Test %s %s, spent %d milliseconds",
                                             testName, "finished", TimeUnit.NANOSECONDS.toMillis(nanos));
             logger.info(finished);
-            sb.append(finished).append("\n");
+            sb.append("\n").append(finished);
         }
     };
 
