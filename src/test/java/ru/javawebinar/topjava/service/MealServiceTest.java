@@ -1,7 +1,9 @@
 package ru.javawebinar.topjava.service;
 
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExternalResource;
 import org.junit.rules.Stopwatch;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
@@ -32,10 +34,11 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
+    private static final StringBuilder sb = new StringBuilder();
+    private static final Logger logger = LoggerFactory.getLogger(MealServiceTest.class);
 
     @Rule
     public Stopwatch stopwatch = new Stopwatch() {
-        private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
         @Override
         protected void finished(long nanos, Description description) {
@@ -44,8 +47,24 @@ public class MealServiceTest {
 
         private void logInfo(Description description, long nanos) {
             String testName = description.getMethodName();
-            logger.info(String.format("Test %s %s, spent %d milliseconds",
-                    testName, "finished", TimeUnit.NANOSECONDS.toMillis(nanos)));
+            String finished = String.format("Test %s %s, spent %d milliseconds",
+                                            testName, "finished", TimeUnit.NANOSECONDS.toMillis(nanos));
+            logger.info(finished);
+            sb.append(finished).append("\n");
+        }
+    };
+
+    @ClassRule
+    public static ExternalResource externalResource = new ExternalResource() {
+        @Override
+        protected void after() {
+            logger.info("\n");
+            logger.info(sb.toString());
+        }
+
+        @Override
+        protected void before() {
+            sb.setLength(0);
         }
     };
 
@@ -122,9 +141,6 @@ public class MealServiceTest {
     @Test
     public void getBetweenInclusive() {
         MEAL_MATCHER.assertMatch(service.getBetweenInclusive(
-                        LocalDate.of(2020, Month.JANUARY, 30),
-                        LocalDate.of(2020, Month.JANUARY, 30), USER_ID),
-                meal3, meal2, meal1);
     }
 
     @Test
