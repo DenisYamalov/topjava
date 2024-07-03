@@ -20,6 +20,7 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertThrows;
@@ -52,7 +53,9 @@ public class MealServiceTest {
             String durationString = String.format("%d milliseconds", duration);
             int dots = 70 - testName.length() - durationString.length();
             StringBuilder formatter = new StringBuilder();
-            formatter.append(new String(new char[dots]).replace("\0", "."));
+            char[] chars = new char[dots];
+            Arrays.fill(chars, '.');
+            formatter.append(new String(chars));
             formatter.insert(0, testName).append(durationString);
             return formatter.toString();
         }
