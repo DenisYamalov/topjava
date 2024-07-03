@@ -34,7 +34,7 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
-    private static final StringBuilder sb = new StringBuilder();
+    private static final StringBuilder summary = new StringBuilder();
     private static final Logger logger = LoggerFactory.getLogger(MealServiceTest.class);
 
     @Rule
@@ -43,24 +43,34 @@ public class MealServiceTest {
         @Override
         protected void finished(long nanos, Description description) {
             String testName = description.getMethodName();
-            String finished = String.format("Test %s finished, spent %d milliseconds",
-                    testName, TimeUnit.NANOSECONDS.toMillis(nanos));
-            logger.info(finished);
-            sb.append("\n").append(finished);
+            logger.info(String.format("Test %s finished, spent %d milliseconds",
+                    testName, TimeUnit.NANOSECONDS.toMillis(nanos)));
+            summary.append("\n").append(format(testName, TimeUnit.NANOSECONDS.toMillis(nanos)));
         }
 
+        private String format(String testName, long duration) {
+            String durationString = String.format("%d milliseconds", duration);
+            int dots = 70 - testName.length() - durationString.length();
+            StringBuilder formatter = new StringBuilder();
+            for (int i = 0; i < dots; i++) {
+                formatter.append(".");
+            }
+            formatter.insert(0, testName).append(durationString);
+            return formatter.toString();
+        }
     };
+
 
     @ClassRule
     public static ExternalResource externalResource = new ExternalResource() {
         @Override
         protected void after() {
-            logger.info(sb.toString());
+            logger.info(summary.toString());
         }
 
         @Override
         protected void before() {
-            sb.setLength(0);
+            summary.setLength(0);
         }
     };
 
