@@ -12,9 +12,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @NamedQueries({
-        @NamedQuery(name = Meal.UPDATE, query = "UPDATE Meal m " +
-                "SET m.description=:description, m.calories=:calories, m.dateTime=:date_time " +
-                "WHERE m.id=:id AND m.user.id=:user_id"),
         @NamedQuery(name = Meal.All_SORTED, query = "SELECT m FROM Meal m WHERE m.user.id=:user_id " +
                 "ORDER BY m.dateTime DESC"),
         @NamedQuery(name = Meal.DELETE, query = "DELETE FROM Meal m WHERE m.id = :id AND m.user.id = :user_id"),
@@ -30,12 +27,11 @@ import java.time.LocalTime;
 public class Meal extends AbstractBaseEntity {
 
     public static final String GET = "Meal.get";
-    public static final String UPDATE = "Meal.update";
     public static final String DELETE = "Meal.delete";
     public static final String All_SORTED = "Meal.getAllSorted";
     public static final String All_BY_DATES = "Meal.getAllByDates";
 
-    @Column(name = "date_time", nullable = false, columnDefinition = "TIMESTAMP NOT NULL")
+    @Column(name = "date_time", nullable = false)
     @NotNull
     private LocalDateTime dateTime;
 
@@ -44,12 +40,13 @@ public class Meal extends AbstractBaseEntity {
     @Length(min = 2, max = 120)
     private String description;
 
-    @Column(name = "calories", nullable = false, columnDefinition = "INT NOT NULL")
+    @Column(name = "calories", nullable = false)
     @Min(10)
     @Max(5000)
     private int calories;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @NotNull
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
