@@ -52,9 +52,7 @@ public class MealServiceTest {
             String durationString = String.format("%d milliseconds", duration);
             int dots = 70 - testName.length() - durationString.length();
             StringBuilder formatter = new StringBuilder();
-            for (int i = 0; i < dots; i++) {
-                formatter.append(".");
-            }
+            formatter.append(new String(new char[dots]).replace("\0", "."));
             formatter.insert(0, testName).append(durationString);
             return formatter.toString();
         }
