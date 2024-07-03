@@ -140,6 +140,14 @@ public class MealServiceTest {
     }
 
     @Test
+    public void updateNotExist() {
+        Meal meal = getNew();
+        meal.setId(NOT_FOUND);
+        assertThrows(NotFoundException.class, () -> service.update(meal, USER_ID));
+    }
+
+
+    @Test
     public void getAll() {
         MEAL_MATCHER.assertMatch(service.getAll(USER_ID), meals);
     }
