@@ -4,7 +4,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import ru.javawebinar.topjava.MealTestData;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
@@ -16,8 +15,7 @@ import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
 import static ru.javawebinar.topjava.UserTestData.USER_ID;
 
-
-public abstract class AbstractMealServiceTest extends AbstractServiceTest<Meal> {
+public abstract class AbstractMealServiceTest extends AbstractServiceTest {
 
     @Autowired
     private MealService service;
@@ -61,6 +59,16 @@ public abstract class AbstractMealServiceTest extends AbstractServiceTest<Meal> 
     }
 
     @Test
+    public void create() {
+        Meal created = service.create(getNew(), USER_ID);
+        int newId = created.id();
+        Meal newMeal = getNew();
+        newMeal.setId(newId);
+        MEAL_MATCHER.assertMatch(created, newMeal);
+        MEAL_MATCHER.assertMatch(service.get(newId, USER_ID), newMeal);
+    }
+
+    @Test
     public void update() {
         Meal updated = getUpdated();
         service.update(updated, USER_ID);
@@ -90,21 +98,5 @@ public abstract class AbstractMealServiceTest extends AbstractServiceTest<Meal> 
     @Test
     public void getBetweenWithNullDates() {
         MEAL_MATCHER.assertMatch(service.getBetweenInclusive(null, null, USER_ID), meals);
-    }
-
-    @Override
-    protected void doCheck(Meal created, int newId, Meal newEntity) {
-        MEAL_MATCHER.assertMatch(created, newEntity);
-        MEAL_MATCHER.assertMatch(service.get(newId, USER_ID), newEntity);
-    }
-
-    @Override
-    protected Meal getNew() {
-        return MealTestData.getNew();
-    }
-
-    @Override
-    protected Meal saveNew(Meal meal) {
-        return service.create(meal, USER_ID);
     }
 }

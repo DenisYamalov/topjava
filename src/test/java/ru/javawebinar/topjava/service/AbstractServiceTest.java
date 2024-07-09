@@ -3,7 +3,6 @@ package ru.javawebinar.topjava.service;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.rules.Stopwatch;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
@@ -16,7 +15,6 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.javawebinar.topjava.ActiveDbProfileResolver;
-import ru.javawebinar.topjava.model.AbstractBaseEntity;
 
 import java.util.concurrent.TimeUnit;
 
@@ -29,7 +27,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 @ActiveProfiles(resolver = ActiveDbProfileResolver.class)
-public abstract class AbstractServiceTest<T extends AbstractBaseEntity> {
+public abstract class AbstractServiceTest {
     private static final Logger log = getLogger("result");
     private static final StringBuilder results = new StringBuilder();
 
@@ -52,6 +50,7 @@ public abstract class AbstractServiceTest<T extends AbstractBaseEntity> {
                          "\n---------------------------------" +
                          results +
                          "\n---------------------------------");
+        results.setLength(0);
     }
 
     @Autowired
@@ -61,20 +60,5 @@ public abstract class AbstractServiceTest<T extends AbstractBaseEntity> {
     public void setup() {
         cacheManager.getCache("users").clear();
     }
-
-    @Test
-    public void create() {
-        T created = saveNew(getNew());
-        int newId = created.id();
-        T newEntity = getNew();
-        newEntity.setId(newId);
-        doCheck(created, newId, newEntity);
-    }
-
-    protected abstract T saveNew(T t);
-
-    protected abstract T getNew();
-
-    protected abstract void doCheck(T created, int newId, T newEntity);
 
 }

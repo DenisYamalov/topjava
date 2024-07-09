@@ -13,10 +13,20 @@ import java.util.List;
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.UserTestData.*;
 
-public abstract class AbstractUserServiceTest extends AbstractServiceTest<User> {
+public abstract class AbstractUserServiceTest extends AbstractServiceTest {
 
     @Autowired
     private UserService service;
+
+    @Test
+    public void create() {
+        User created = service.create(getNew());
+        int newId = created.id();
+        User newUser = getNew();
+        newUser.setId(newId);
+        USER_MATCHER.assertMatch(created, newUser);
+        USER_MATCHER.assertMatch(service.get(newId), newUser);
+    }
 
     @Test
     public void duplicateMailCreate() {
@@ -65,19 +75,4 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest<User> 
         USER_MATCHER.assertMatch(all, admin, guest, user);
     }
 
-    @Override
-    protected User saveNew(User user) {
-        return service.create(user);
-    }
-
-    @Override
-    protected User getNew() {
-        return UserTestData.getNew();
-    }
-
-    @Override
-    protected void doCheck(User created, int newId, User newEntity) {
-        USER_MATCHER.assertMatch(created, newEntity);
-        USER_MATCHER.assertMatch(service.get(newId), newEntity);
-    }
 }

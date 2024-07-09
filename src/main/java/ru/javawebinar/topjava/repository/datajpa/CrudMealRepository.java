@@ -16,11 +16,12 @@ public interface CrudMealRepository extends JpaRepository<Meal, Integer> {
     @Query(name = Meal.DELETE)
     int delete(@Param("id") int id, @Param("userId") int userId);
 
+    @Transactional
     @Modifying
     @Query(name = Meal.ALL_SORTED)
     List<Meal> getAllSorted(@Param("userId") int userId);
 
-
+    @Transactional
     @Modifying
     @Query(name = Meal.GET_BETWEEN)
     List<Meal> getBetweenHalfOpen(@Param("startDateTime") LocalDateTime startDateTime,
