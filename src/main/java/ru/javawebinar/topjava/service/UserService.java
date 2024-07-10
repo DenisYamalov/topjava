@@ -41,6 +41,10 @@ public class UserService {
         return checkNotFound(repository.getByEmail(email), "email=" + email);
     }
 
+    public User getWIthMeals(int id) {
+        return repository.getWIthMeals(id);
+    }
+
     @Cacheable("users")
     public List<User> getAll() {
         return repository.getAll();
