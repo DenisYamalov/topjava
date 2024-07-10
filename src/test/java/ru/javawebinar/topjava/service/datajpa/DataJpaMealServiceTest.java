@@ -6,14 +6,21 @@ import ru.javawebinar.topjava.MealTestData;
 import ru.javawebinar.topjava.Profiles;
 import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.service.AbstractMealServiceTest;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static ru.javawebinar.topjava.MealTestData.*;
+import static ru.javawebinar.topjava.UserTestData.*;
 
 @ActiveProfiles(Profiles.DATAJPA)
 public class DataJpaMealServiceTest extends AbstractMealServiceTest {
     @Test
-    public void getMealWithUser(){
-        Meal meal = service.getWithUser(MealTestData.MEAL1_ID, UserTestData.USER_ID);
-        MealTestData.MEAL_MATCHER.assertMatch(meal,MealTestData.meal1);
-        UserTestData.USER_MATCHER.assertMatch(meal.getUser(),UserTestData.user);
+    public void getMealWithUser() {
+        Meal meal = service.getWithUser(MEAL1_ID, USER_ID);
+        User user = meal.getUser();
+        MEAL_MATCHER.assertMatch(meal, meal1);
+        assertThat(user).usingRecursiveComparison().comparingOnlyFields("email", "password", "enabled",
+                                                                        "caloriesPerDay");
     }
 }

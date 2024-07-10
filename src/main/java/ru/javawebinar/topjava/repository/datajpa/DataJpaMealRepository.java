@@ -48,7 +48,7 @@ public class DataJpaMealRepository implements MealRepository {
         Meal meal = get(id, userId);
         User user = userRepository.findById(userId).orElse(null);
         meal.setUser(user);
-        return MealRepository.super.getWithUser(id, userId);
+        return meal;
     }
 
     @Override

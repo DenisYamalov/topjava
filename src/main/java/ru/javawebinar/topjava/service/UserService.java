@@ -42,7 +42,7 @@ public class UserService {
     }
 
     public User getWIthMeals(int id) {
-        return repository.getWIthMeals(id);
+        return checkNotFoundWithId(repository.getWIthMeals(id), id);
     }
 
     @Cacheable("users")
