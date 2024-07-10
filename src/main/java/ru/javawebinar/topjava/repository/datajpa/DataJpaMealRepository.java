@@ -42,6 +42,15 @@ public class DataJpaMealRepository implements MealRepository {
         return meal.filter(m -> m.getUser().getId() == userId).orElse(null);
     }
 
+    @Transactional
+    @Override
+    public Meal getWithUser(int id, int userId) {
+        Meal meal = get(id, userId);
+        User user = userRepository.findById(userId).orElse(null);
+        meal.setUser(user);
+        return MealRepository.super.getWithUser(id, userId);
+    }
+
     @Override
     public List<Meal> getAll(int userId) {
         return crudRepository.getAllSorted(userId);
