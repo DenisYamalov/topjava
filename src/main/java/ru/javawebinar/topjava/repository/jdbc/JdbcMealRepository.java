@@ -36,6 +36,7 @@ public class JdbcMealRepository implements MealRepository {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
+    @Transactional
     @Override
     public Meal save(Meal meal, int userId) {
         MapSqlParameterSource map = new MapSqlParameterSource()
@@ -59,6 +60,7 @@ public class JdbcMealRepository implements MealRepository {
         return meal;
     }
 
+    @Transactional
     @Override
     public boolean delete(int id, int userId) {
         return jdbcTemplate.update("DELETE FROM meal WHERE id=? AND user_id=?", id, userId) != 0;
