@@ -15,10 +15,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import ru.javawebinar.topjava.ActiveDbProfileResolver;
 import ru.javawebinar.topjava.TimingRules;
 
-import java.util.Arrays;
-
 import static org.junit.Assert.assertThrows;
-import static ru.javawebinar.topjava.Profiles.JDBC;
 import static ru.javawebinar.topjava.util.ValidationUtil.getRootCause;
 
 @ContextConfiguration({
@@ -33,11 +30,11 @@ public abstract class AbstractServiceTest {
     @Autowired
     Environment env;
 
-    protected boolean isJdbcProfile() {
-        String[] activeProfiles = env.getActiveProfiles();
-        Arrays.stream(activeProfiles).forEach(System.out::println);
-        return Arrays.stream(activeProfiles).anyMatch(s -> s.contains(JDBC.toLowerCase()));
-    }
+//    protected boolean isJdbcProfile() {
+//        String[] activeProfiles = env.getActiveProfiles();
+//        Arrays.stream(activeProfiles).forEach(System.out::println);
+//        return Arrays.stream(activeProfiles).anyMatch(s -> s.contains(JDBC.toLowerCase()));
+//    }
 
     @ClassRule
     public static ExternalResource summary = TimingRules.SUMMARY;

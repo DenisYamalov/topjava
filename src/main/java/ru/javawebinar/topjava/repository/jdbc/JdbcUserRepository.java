@@ -14,6 +14,9 @@ import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
@@ -52,30 +55,39 @@ public class JdbcUserRepository implements UserRepository {
 
     private final SimpleJdbcInsert insertUser;
 
+    private final Validator validator;
+
     @Autowired
-    public JdbcUserRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    public JdbcUserRepository(JdbcTemplate jdbcTemplate,
+                              NamedParameterJdbcTemplate namedParameterJdbcTemplate,
+                              Validator validator) {
         this.insertUser = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
                 .usingGeneratedKeyColumns("id");
 
         this.jdbcTemplate = jdbcTemplate;
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+        this.validator = validator;
     }
 
     @Transactional
     @Override
     public User save(User user) {
+        Set<ConstraintViolation<User>> constraintViolations = validator.validate(user);
+        if (!constraintViolations.isEmpty()) {
+            throw new ConstraintViolationException(constraintViolations);
+        }
         BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(user);
         List<Role> roles = user.getRoles().stream().toList();
         if (user.isNew()) {
             Number newKey = insertUser.executeAndReturnKey(parameterSource);
             user.setId(newKey.intValue());
         } else if (namedParameterJdbcTemplate.update("""
-                        UPDATE users SET name=:name, email=:email, password=:password, 
-                        registered=:registered, enabled=:enabled, calories_per_day=:caloriesPerDay WHERE id=:id
-                        """, parameterSource) == 0
-                ||
-                jdbcTemplate.update("DELETE FROM user_role WHERE user_id=?", user.id()) == -1) {
+                               UPDATE users SET name=:name, email=:email, password=:password, 
+                               registered=:registered, enabled=:enabled, calories_per_day=:caloriesPerDay WHERE id=:id
+                               """, parameterSource) == 0
+                   ||
+                   jdbcTemplate.update("DELETE FROM user_role WHERE user_id=?", user.id()) == -1) {
             return null;
         }
         jdbcTemplate.batchUpdate("INSERT INTO user_role (user_id, role) VALUES (?,?)",
@@ -103,20 +115,20 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     public User get(int id) {
         List<User> users = jdbcTemplate.query("SELECT * FROM users LEFT JOIN user_role ON users.id=user_role.user_id " +
-                                                      "WHERE users.id=?", RESULT_SET_EXTRACTOR, id);
+                                              "WHERE users.id=?", RESULT_SET_EXTRACTOR, id);
         return DataAccessUtils.singleResult(users);
     }
 
     @Override
     public User getByEmail(String email) {
         List<User> users = jdbcTemplate.query("SELECT * FROM users LEFT JOIN user_role ON users.id=user_role.user_id " +
-                                                      "WHERE email=?", RESULT_SET_EXTRACTOR, email);
+                                              "WHERE email=?", RESULT_SET_EXTRACTOR, email);
         return DataAccessUtils.singleResult(users);
     }
 
     @Override
     public List<User> getAll() {
         return jdbcTemplate.query("SELECT * FROM users LEFt JOIN user_role ON users.id = user_role.user_id ORDER BY " +
-                                          "name, email", RESULT_SET_EXTRACTOR);
+                                  "name, email", RESULT_SET_EXTRACTOR);
     }
 }
