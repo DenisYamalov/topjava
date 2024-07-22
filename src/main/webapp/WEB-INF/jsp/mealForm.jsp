@@ -8,15 +8,17 @@
 <body>
 <jsp:include page="fragments/bodyHeader.jsp"/>
 <section>
-    <c:if test="${action=='create'}">
-        <h2><spring:message code="meal.create"/></h2>
-    </c:if>
-    <c:if test="${action!='create'}">
-        <h2><spring:message code="meal.edit"/></h2>
-    </c:if>
+    <c:choose>
+        <c:when test="${meal.id==null}">
+            <h2><spring:message code="meal.create"/></h2>
+        </c:when>
+        <c:otherwise>
+            <h2><spring:message code="meal.edit"/></h2>
+        </c:otherwise>
+    </c:choose>
 
     <jsp:useBean id="meal" type="ru.javawebinar.topjava.model.Meal" scope="request"/>
-    <form method="post" action="${pageContext.request.contextPath}/meals">
+    <form method="post" action="meals">
         <input type="hidden" name="id" value="${meal.id}">
         <dl>
             <dt><spring:message code="meal.dateTime"/>:</dt>
