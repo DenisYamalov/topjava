@@ -1,8 +1,10 @@
 package ru.javawebinar.topjava.repository.jdbc;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -26,30 +28,34 @@ import java.util.Map;
 @Repository
 @Transactional(readOnly = true)
 public class JdbcUserRepository implements UserRepository {
+    private static final BeanPropertyRowMapper<User> ROW_MAPPER = BeanPropertyRowMapper.newInstance(User.class,new DefaultConversionService());
 
     private static final ResultSetExtractor<List<User>> RESULT_SET_EXTRACTOR = rs -> {
         Map<Integer, User> userMap = new LinkedHashMap<>();
+        int rowNumber =0;
         while (rs.next()) {
-            User user = new User();
-            user.setRoles(new HashSet<>());
-            user.setId(rs.getInt("id"));
-            user.setEmail(rs.getString("email"));
-            user.setName(rs.getString("name"));
-            user.setPassword(rs.getString("password"));
-            user.setRegistered(rs.getDate("registered"));
-            user.setEnabled(rs.getBoolean("enabled"));
-            user.setCaloriesPerDay(rs.getInt("calories_per_day"));
+            User user;
             String role = rs.getString("role");
-            if (role != null) {
-                user.getRoles().add(Role.valueOf(role));
+            int id = rs.getInt("id");
+            if (!userMap.containsKey(id)){
+                user = ROW_MAPPER.mapRow(rs, rowNumber);
+                user.setRoles(new HashSet<>());
+                setRole(role, user);
+                userMap.put(id,user);
+            } else {
+                userMap.compute(id,(integer, user1) -> setRole(role, user1));
             }
-            userMap.merge(user.id(), user, (old, newUser) -> {
-                newUser.getRoles().addAll(old.getRoles());
-                return newUser;
-            });
+            rowNumber++;
         }
         return userMap.values().stream().toList();
     };
+
+    private static User setRole(String role, User user) {
+        if (role != null) {
+            user.getRoles().add(Role.valueOf(role));
+        }
+        return user;
+    }
 
     private final JdbcTemplate jdbcTemplate;
 
