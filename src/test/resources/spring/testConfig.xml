@@ -5,8 +5,6 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
+    <bean id="noOpCacheManager" class="org.springframework.cache.support.NoOpCacheManager"/>
     <context:property-override location="prop/beanOverride.properties"/>
-
-<!--    <bean id="noCacheManager" class="org.springframework.cache.support.NoOpCacheManager">-->
-<!--    </bean>-->
 </beans>
