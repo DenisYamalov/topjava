@@ -78,7 +78,6 @@ public class JdbcUserRepository implements UserRepository {
     public User save(User user) {
         ValidationUtil.checkConstraints(user);
         BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(user);
-        List<Role> roles = user.getRoles().stream().toList();
         if (user.isNew()) {
             Number newKey = insertUser.executeAndReturnKey(parameterSource);
             user.setId(newKey.intValue());
@@ -90,19 +89,22 @@ public class JdbcUserRepository implements UserRepository {
         } else {
             jdbcTemplate.update("DELETE FROM user_role WHERE user_id=?", user.id());
         }
-        jdbcTemplate.batchUpdate("INSERT INTO user_role (user_id, role) VALUES (?,?)",
-                new BatchPreparedStatementSetter() {
-                    @Override
-                    public void setValues(PreparedStatement ps, int i) throws SQLException {
-                        ps.setInt(1, user.id());
-                        ps.setString(2, roles.get(i).name());
-                    }
+        List<Role> roles = user.getRoles().stream().toList();
+        if (!roles.isEmpty()){
+            jdbcTemplate.batchUpdate("INSERT INTO user_role (user_id, role) VALUES (?,?)",
+                    new BatchPreparedStatementSetter() {
+                        @Override
+                        public void setValues(PreparedStatement ps, int i) throws SQLException {
+                            ps.setInt(1, user.id());
+                            ps.setString(2, roles.get(i).name());
+                        }
 
-                    @Override
-                    public int getBatchSize() {
-                        return roles.size();
-                    }
-                });
+                        @Override
+                        public int getBatchSize() {
+                            return roles.size();
+                        }
+                    });
+        }
         return user;
     }
 
