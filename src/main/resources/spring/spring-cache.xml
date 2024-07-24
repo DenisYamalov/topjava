@@ -9,7 +9,17 @@
          http://www.springframework.org/schema/cache/spring-cache.xsd">
 
     <!-- enables scanning for @Cacheable annotation -->
-    <cache:annotation-driven cache-manager="ehCacheManager"/>
+<!--    <cache:annotation-driven cache-manager="ehCacheManager"/>-->
+    <cache:annotation-driven cache-manager="cacheManager"/>
+
+    <bean id="cacheManager" class="org.springframework.cache.support.CompositeCacheManager">
+        <property name="cacheManagers">
+            <list>
+                <ref bean="ehCacheManager"/>
+            </list>
+        </property>
+        <property name="fallbackToNoOpCache" value="true"/>
+    </bean>
 
     <!--https://imhoratiu.wordpress.com/2017/01/26/spring-4-with-ehcache-3-how-to/-->
     <bean id="ehCacheManager" class="org.springframework.cache.jcache.JCacheCacheManager">
@@ -17,4 +27,5 @@
             <bean class="org.springframework.cache.jcache.JCacheManagerFactoryBean" p:cacheManagerUri="classpath:cache/ehcache.xml"/>
         </property>
     </bean>
+
 </beans>

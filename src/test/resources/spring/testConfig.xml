@@ -7,6 +7,6 @@
 
     <context:property-override location="prop/beanOverride.properties"/>
 
-<!--    <bean id="noCacheManager" class="org.springframework.cache.support.NoOpCacheManager">-->
-<!--    </bean>-->
+    <bean id="noCacheManager" class="org.springframework.cache.support.NoOpCacheManager">
+    </bean>
 </beans>
