@@ -28,7 +28,7 @@ import java.util.*;
 public class JdbcUserRepository implements UserRepository {
     private static final BeanPropertyRowMapper<User> ROW_MAPPER = BeanPropertyRowMapper.newInstance(User.class, new DefaultConversionService());
 
-    private static final ResultSetExtractor<List<User>> RESULT_SET_EXTRACTOR = new ResultSetExtractor<List<User>>() {
+    private static final ResultSetExtractor<List<User>> RESULT_SET_EXTRACTOR = new ResultSetExtractor<>() {
         @Override
         public List<User> extractData(ResultSet rs) throws SQLException, DataAccessException {
             Map<Integer, User> userMap = new LinkedHashMap<>();
@@ -39,16 +39,16 @@ public class JdbcUserRepository implements UserRepository {
                 if (!userMap.containsKey(id)) {
                     user = ROW_MAPPER.mapRow(rs, rs.getRow());
                     user.setRoles(EnumSet.noneOf(Role.class));
-                    setRole(role, user);
+                    addRole(role, user);
                     userMap.put(id, user);
                 } else {
-                    userMap.compute(id, (integer, user1) -> setRole(role, user1));
+                    userMap.compute(id, (integer, user1) -> addRole(role, user1));
                 }
             }
             return new ArrayList<>(userMap.values());
         }
 
-        private static User setRole(String role, User user) {
+        private static User addRole(String role, User user) {
             if (role != null) {
                 user.getRoles().add(Role.valueOf(role));
             }
@@ -89,7 +89,7 @@ public class JdbcUserRepository implements UserRepository {
         } else {
             jdbcTemplate.update("DELETE FROM user_role WHERE user_id=?", user.id());
         }
-        List<Role> roles = user.getRoles().stream().toList();
+        List<Role> roles = new ArrayList<>(user.getRoles());
         if (!roles.isEmpty()){
             jdbcTemplate.batchUpdate("INSERT INTO user_role (user_id, role) VALUES (?,?)",
                     new BatchPreparedStatementSetter() {
