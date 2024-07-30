@@ -3,6 +3,8 @@ package ru.javawebinar.topjava.web;
 import org.assertj.core.matcher.AssertionMatcher;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.test.context.ActiveProfiles;
+import ru.javawebinar.topjava.Profiles;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.util.MealsUtil;
@@ -15,6 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static ru.javawebinar.topjava.UserTestData.*;
 import static ru.javawebinar.topjava.MealTestData.*;
 
+@ActiveProfiles(Profiles.REPOSITORY_IMPLEMENTATION)
 class RootControllerTest extends AbstractControllerTest {
 
     @Test

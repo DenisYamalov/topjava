@@ -3,10 +3,7 @@ package ru.javawebinar.topjava.web.user;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import ru.javawebinar.topjava.MealTestData;
-import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.service.UserService;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
@@ -15,11 +12,10 @@ import ru.javawebinar.topjava.web.json.JsonUtil;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.javawebinar.topjava.MealTestData.MEAL_MATCHER;
 import static ru.javawebinar.topjava.UserTestData.*;
-import static ru.javawebinar.topjava.web.user.ProfileRestController.REST_URL;
 
-class ProfileRestControllerTest extends AbstractControllerTest {
+public abstract class AbstractProfileRestControllerTest extends AbstractControllerTest {
+    protected static final String REST_URL = ProfileRestController.REST_URL;
 
     @Autowired
     private UserService userService;
@@ -48,16 +44,5 @@ class ProfileRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isNoContent());
 
         USER_MATCHER.assertMatch(userService.get(USER_ID), updated);
-    }
-
-    @Test
-    void getWithMeals() throws Exception {
-        ResultActions action = perform(MockMvcRequestBuilders.get(REST_URL + "/with-meals/" + USER_ID))
-                .andExpect(status().isOk())
-                .andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
-        User userWithMeals = USER_WITH_MEALS_MATCHER.readFromJson(action);
-        USER_MATCHER.assertMatch(userWithMeals, user);
-        MEAL_MATCHER.assertMatch(userWithMeals.getMeals(), MealTestData.meals);
     }
 }
