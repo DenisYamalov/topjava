@@ -11,11 +11,11 @@ public class CustomTimeFormatter implements Formatter<LocalTime> {
 
     @Override
     public LocalTime parse(String text, Locale locale) {
-        return text.isBlank() ? null : LocalTime.parse(text, TIME_FORMATTER);
+        return LocalTime.parse(text, TIME_FORMATTER);
     }
 
     @Override
     public String print(LocalTime localTime, Locale locale) {
-        return localTime == null ? "" : localTime.format(TIME_FORMATTER);
+        return localTime.format(TIME_FORMATTER);
     }
 }

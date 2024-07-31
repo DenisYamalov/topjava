@@ -11,11 +11,11 @@ public class CustomDateFormatter implements Formatter<LocalDate> {
 
     @Override
     public LocalDate parse(String text, Locale locale) {
-        return text.isBlank() ? null : LocalDate.parse(text, DATE_FORMATTER);
+        return LocalDate.parse(text, DATE_FORMATTER);
     }
 
     @Override
     public String print(LocalDate localDate, Locale locale) {
-        return localDate == null ? "" : localDate.format(DATE_FORMATTER);
+        return localDate.format(DATE_FORMATTER);
     }
 }
