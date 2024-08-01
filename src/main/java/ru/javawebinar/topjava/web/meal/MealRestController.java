@@ -55,7 +55,6 @@ public class MealRestController extends AbstractMealController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Meal> createWithLocation(@RequestBody Meal meal) {
         Meal created = super.create(meal);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
