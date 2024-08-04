@@ -5,14 +5,15 @@
 <html>
 <jsp:include page="fragments/headTag.jsp"/>
 <body>
-<jsp:include page="fragments/bodyHeader.jsp"/>
 <script src="resources/js/topjava.common.js" defer></script>
 <script src="resources/js/topjava.meals.js" defer></script>
+<jsp:include page="fragments/bodyHeader.jsp"/>
 
 <section>
     <h3><spring:message code="meal.title"/></h3>
 
-    <form method="get" action="meals/filter">
+<%--    <form id="filterForm" method="get" action="meals/filter">--%>
+    <form id="filterForm">
         <dl>
             <dt><spring:message code="meal.startDate"/>:</dt>
             <dd><input type="date" name="startDate" value="${param.startDate}"></dd>
@@ -29,7 +30,9 @@
             <dt><spring:message code="meal.endTime"/>:</dt>
             <dd><input type="time" name="endTime" value="${param.endTime}"></dd>
         </dl>
-        <button type="submit"><spring:message code="meal.filter"/></button>
+<%--        <button type="submit" ><spring:message code="meal.filter"/></button>--%>
+<%--        <button class="btn btn-primary" onclick="filter()" ><spring:message code="meal.filter"/></button>--%>
+        <button class="btn btn-primary" onclick="getFiltered()" ><spring:message code="meal.filter"/></button>
     </form>
     <hr>
     <button class="btn btn-primary" onclick="add()">
@@ -45,6 +48,7 @@
             <th><spring:message code="meal.calories"/></th>
             <th></th>
             <th></th>
+<%--            <th colspan="2">Actions</th>--%>
         </tr>
         </thead>
         <c:forEach items="${requestScope.meals}" var="meal">

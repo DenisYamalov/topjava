@@ -1,8 +1,12 @@
 const mealAjaxUrl = "meals/";
+const mealAjaxFilterUrl = "meals/filter";
 
 const ctx = {
-    ajaxUrl: mealAjaxUrl
+    ajaxUrl: mealAjaxUrl,
+    ajaxFilterUrl: mealAjaxFilterUrl
 };
+
+const filterForm = $("#filterForm");
 
 // $(document).ready(function () {
 $(function () {
@@ -38,3 +42,12 @@ $(function () {
         })
     );
 });
+
+function getFiltered() {
+    $.get(mealAjaxFilterUrl,
+        filterForm.serialize(),
+        function (data) {
+        console.log(data)
+        ctx.datatableApi.clear().rows.add(data).draw();
+    });
+}
