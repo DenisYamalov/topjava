@@ -13,8 +13,14 @@ import java.time.LocalTime;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/meals", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/meals/ui", produces = MediaType.APPLICATION_JSON_VALUE)
 public class MealUIController extends AbstractMealController {
+
+    @Override
+    @GetMapping
+    public List<MealTo> getAll() {
+        return super.getAll();
+    }
 
     @Override
     @DeleteMapping("/{id}")
