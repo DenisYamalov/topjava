@@ -1,5 +1,5 @@
-const mealAjaxUrl = "meals/ui/";
-const mealAjaxFilterUrl = "meals/ui/filter";
+const mealAjaxUrl = "ui/meals/";
+const mealAjaxFilterUrl = mealAjaxUrl + "filter";
 
 const ctx = {
     ajaxUrl: mealAjaxUrl,
@@ -8,7 +8,6 @@ const ctx = {
 
 const filterForm = $("#filterForm");
 
-// $(document).ready(function () {
 $(function () {
     makeEditable(
         $("#datatable").DataTable({
@@ -45,17 +44,21 @@ $(function () {
 
 function getFiltered() {
     $.ajax({
-            url: ctx.ajaxFilterUrl,
-            method: "get",
-            dataType: "html",
-            data: filterForm.serialize(),
-            // success: function (data) {
-            //     return ctx.datatableApi.clear().rows.add(data).draw();
-            // }
-        }.done(function (data, textStatus, jqXHR) {
+        url: ctx.ajaxFilterUrl,
+        method: "get",
+        dataType: "html",
+        data: filterForm.serialize()
+    }).done(function (data, textStatus, jqXHR) {
+            console.log(data);
             console.log(textStatus);
             console.log(jqXHR);
             ctx.datatableApi.clear().rows.add(data).draw();
-        })
+        }
     );
 }
+
+$("#filter").click(function (event) {
+    event.preventDefault();
+    getFiltered();
+    return false;
+})

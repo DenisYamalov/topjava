@@ -32,7 +32,7 @@
         </dl>
 <%--        <button type="submit" ><spring:message code="meal.filter"/></button>--%>
 <%--        <button class="btn btn-primary" onclick="filter()" ><spring:message code="meal.filter"/></button>--%>
-        <button class="btn btn-primary" onclick="getFiltered()" ><spring:message code="meal.filter"/></button>
+        <button class="btn btn-primary" id="filter" ><spring:message code="meal.filter"/></button>
     </form>
     <hr>
     <button class="btn btn-primary" onclick="add()">
