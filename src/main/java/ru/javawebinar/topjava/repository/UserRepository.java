@@ -22,4 +22,11 @@ public interface UserRepository {
     default User getWithMeals(int id) {
         throw new UnsupportedOperationException();
     }
+
+    /**
+     * @param id
+     * @param enabled
+     * @return true if parameter has been set up
+     */
+    boolean enabled(int id, boolean enabled);
 }

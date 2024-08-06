@@ -10,7 +10,6 @@ import java.util.Objects;
 
 import static ru.javawebinar.topjava.UserTestData.*;
 
-
 @Repository
 public class InMemoryUserRepository extends InMemoryBaseRepository<User> implements UserRepository {
 
@@ -36,5 +35,13 @@ public class InMemoryUserRepository extends InMemoryBaseRepository<User> impleme
                 .filter(u -> email.equals(u.getEmail()))
                 .findFirst()
                 .orElse(null);
+    }
+
+    @Override
+    public boolean enabled(int id, boolean enabled) {
+        return map.computeIfPresent(id, (integer, user1) -> {
+            user1.setEnabled(enabled);
+            return user1;
+        }) == null;
     }
 }

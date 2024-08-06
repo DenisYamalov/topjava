@@ -54,8 +54,8 @@ public class JpaUserRepository implements UserRepository {
         return query.setParameter("id", id).executeUpdate() != 0;
 */
         return em.createNamedQuery(User.DELETE)
-                .setParameter("id", id)
-                .executeUpdate() != 0;
+                       .setParameter("id", id)
+                       .executeUpdate() != 0;
     }
 
     @Override
@@ -71,5 +71,15 @@ public class JpaUserRepository implements UserRepository {
     public List<User> getAll() {
         return em.createNamedQuery(User.ALL_SORTED, User.class)
                 .getResultList();
+    }
+
+    @Override
+    @Transactional
+    public boolean enabled(int id, boolean enabled) {
+        User user = em.find(User.class, id);
+        if (user != null) {
+            user.setEnabled(enabled);
+        }
+        return em.merge(user) == null;
     }
 }
