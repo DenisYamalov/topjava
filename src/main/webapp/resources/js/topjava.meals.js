@@ -1,9 +1,8 @@
 const mealAjaxUrl = "ui/meals/";
-const mealAjaxFilterUrl = mealAjaxUrl + "filter";
 
 const ctx = {
     ajaxUrl: mealAjaxUrl,
-    ajaxFilterUrl: mealAjaxFilterUrl
+    ajaxFilterUrl: mealAjaxUrl + "filter"
 };
 
 const filterForm = $("#filterForm");
@@ -43,18 +42,9 @@ $(function () {
 });
 
 function getFiltered() {
-    $.ajax({
-        url: ctx.ajaxFilterUrl,
-        method: "get",
-        dataType: "html",
-        data: filterForm.serialize()
-    }).done(function (data, textStatus, jqXHR) {
-            console.log(data);
-            console.log(textStatus);
-            console.log(jqXHR);
-            ctx.datatableApi.clear().rows.add(data).draw();
-        }
-    );
+    $.get(ctx.ajaxFilterUrl, filterForm.serialize(), function (data) {
+        ctx.datatableApi.clear().rows.add(data).draw();
+    });
 }
 
 $("#filter").click(function (event) {
