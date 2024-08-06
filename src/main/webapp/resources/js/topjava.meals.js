@@ -51,4 +51,11 @@ $("#filter").click(function (event) {
     event.preventDefault();
     getFiltered();
     return false;
-})
+});
+
+$("#filterDismiss").click(function (event) {
+    event.preventDefault();
+    filterForm[0].reset();
+    updateTable();
+    return false;
+});
