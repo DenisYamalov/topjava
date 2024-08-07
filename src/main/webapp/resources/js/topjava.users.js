@@ -45,3 +45,20 @@ $(function () {
         })
     );
 });
+
+function enabled(checkboxElem) {
+    let row = $(checkboxElem).parents('tr');
+    let setEnabled = !!checkboxElem.checked;
+    setEnabledOnServer(row.attr('id'), setEnabled);
+    row.attr('enabled', setEnabled);
+}
+
+function setEnabledOnServer(userId, setEnabled) {
+    $.ajax({
+        type: "POST",
+        url: ctx.ajaxUrl + "enable/" + userId,
+        data: {enabled: setEnabled}
+    }).done(function () {
+    });
+}
+
