@@ -3,7 +3,7 @@ const userAjaxUrl = "admin/users/";
 // https://stackoverflow.com/a/5064235/548473
 const ctx = {
     ajaxUrl: userAjaxUrl,
-    updateTable: getFiltered
+    updateTable: updateTable
 };
 
 // $(document).ready(function () {
@@ -50,16 +50,13 @@ $(function () {
 function enable(checkboxElem) {
     let row = $(checkboxElem).parents('tr');
     let setEnabled = checkboxElem.checked;
-    enabled(row.attr('id'), setEnabled);
-    row.attr('enabled', setEnabled);
-}
-
-function enabled(userId, setEnabled) {
     $.ajax({
         type: "POST",
-        url: ctx.ajaxUrl + "enable/" + userId,
+        url: ctx.ajaxUrl + "enable/" + row.attr('id'),
         data: {enabled: setEnabled}
     }).done(function () {
+        row.attr('enabled', setEnabled);
+    }).fail(function () {
+        $(checkboxElem).prop('checked', !setEnabled);
     });
 }
-

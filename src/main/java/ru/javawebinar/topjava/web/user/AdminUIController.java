@@ -35,7 +35,7 @@ public class AdminUIController extends AbstractUserController {
 
     @PostMapping("/enable/{id}")
     public void enable(@PathVariable int id, @RequestParam boolean enabled) {
-        log.info("setEnabled: {}:{}",id,enabled);
+        log.info("setEnabled id:{} enabled:{}", id, enabled);
         service.enable(id, enabled);
     }
 }

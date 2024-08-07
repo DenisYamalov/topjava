@@ -80,6 +80,6 @@ public class JpaUserRepository implements UserRepository {
         if (user != null) {
             user.setEnabled(enabled);
         }
-        return em.merge(user) == null;
+        return em.merge(user) != null;
     }
 }
