@@ -62,7 +62,7 @@ public class AdminRestController extends AbstractUserController {
         return super.getWithMeals(id);
     }
 
-    @PutMapping("/enable/{id}")
+    @PatchMapping("/{id}/enable")
     public void enable(@PathVariable int id, @RequestParam boolean enabled) {
         service.enable(id, enabled);
     }
