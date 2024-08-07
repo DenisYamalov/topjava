@@ -2,7 +2,8 @@ const mealAjaxUrl = "ui/meals/";
 
 const ctx = {
     ajaxUrl: mealAjaxUrl,
-    ajaxFilterUrl: mealAjaxUrl + "filter"
+    ajaxFilterUrl: mealAjaxUrl + "filter",
+    updateTable: getFiltered
 };
 
 const filterForm = $("#filterForm");
@@ -41,15 +42,9 @@ $(function () {
     );
 });
 
-let updateTableCommon = updateTable;
-
-updateTable = function () {
-    return getFiltered();
-};
-
 function getFiltered() {
     $.get(ctx.ajaxFilterUrl, filterForm.serialize(), function (data) {
-        ctx.datatableApi.clear().rows.add(data).draw();
+        fillTable(data);
     });
 }
 
@@ -62,6 +57,5 @@ $("#filter").click(function (event) {
 $("#filterDismiss").click(function (event) {
     event.preventDefault();
     filterForm[0].reset();
-    updateTable();
-    return false;
+    ctx.updateTable();
 });
