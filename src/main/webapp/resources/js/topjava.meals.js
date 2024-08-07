@@ -41,6 +41,12 @@ $(function () {
     );
 });
 
+let updateTableCommon = updateTable;
+
+updateTable = function () {
+    return getFiltered();
+};
+
 function getFiltered() {
     $.get(ctx.ajaxFilterUrl, filterForm.serialize(), function (data) {
         ctx.datatableApi.clear().rows.add(data).draw();
