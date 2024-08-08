@@ -49,14 +49,14 @@ $(function () {
 
 function enable(checkboxElem) {
     let row = $(checkboxElem).parents('tr');
-    let setEnabled = checkboxElem.checked;
+    let enabled = checkboxElem.checked;
     $.ajax({
         type: "POST",
         url: ctx.ajaxUrl + "enable/" + row.attr('id'),
-        data: {enabled: setEnabled}
+        data: {enabled: enabled}
     }).done(function () {
-        row.attr('enabled', setEnabled);
+        row.attr('enabled', enabled);
     }).fail(function () {
-        $(checkboxElem).prop('checked', !setEnabled);
+        $(checkboxElem).prop('checked', !enabled);
     });
 }

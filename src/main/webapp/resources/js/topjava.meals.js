@@ -51,7 +51,6 @@ function getFiltered() {
 $("#filter").click(function (event) {
     event.preventDefault();
     getFiltered();
-    return false;
 });
 
 $("#filterDismiss").click(function (event) {
