@@ -115,10 +115,8 @@
 <jsp:include page="fragments/footer.jsp"/>
 </body>
 <script type="text/javascript">
-    const i18n = {}; // https://learn.javascript.ru/object
-    i18n["addTitle"] = '<spring:message code="meal.add"/>';
-    i18n["editTitle"] = '<spring:message code="meal.edit"/>';
-
-    <%@ include file="fragments/i118n.jspf"%>
+    <jsp:include page="fragments/i118n.jsp"/>
+    sessionStorage.setItem("addTitle",'<spring:message code="meal.add"/>')
+    sessionStorage.setItem("editTitle",'<spring:message code="meal.edit"/>')
 </script>
 </html>
