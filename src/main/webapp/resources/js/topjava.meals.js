@@ -31,7 +31,12 @@ $(function () {
                     "data": "dateTime",
                     "render": function (dateTime, type, row) {
                         if (type === "display") {
-                            return new Date(dateTime).toLocaleString();
+                            let d = new Date(dateTime);
+                            Number.prototype.padLeft = function (base, chr) {
+                                const len = (String(base || 10).length - String(this).length) + 1;
+                                return len > 0 ? new Array(len).join(chr || '0') + this : this;
+                            }
+                            return d.getFullYear() + "-" + (d.getMonth() + 1).padLeft() + "-" + d.getDate().padLeft() + " " + d.getHours() + ":" + d.getMinutes().padLeft();
                         }
                         return dateTime;
                     }
@@ -68,25 +73,45 @@ $(function () {
 
 $('#dateTime').datetimepicker({
     format: 'Y-m-d\\TH:i',
-    validateOnBlur:false
+    validateOnBlur: false
 });
 
 $('#startDate').datetimepicker({
     timepicker: false,
-    format: 'Y-m-d'
+    format: 'Y-m-d',
+    onShow: function (ct) {
+        this.setOptions({
+            maxDate: $('#endDate').val() ? $('#endDate').val() : false
+        });
+    }
 });
 
 $('#endDate').datetimepicker({
     timepicker: false,
-    format: 'Y-m-d'
+    format: 'Y-m-d',
+    onShow: function (ct){
+        this.setOptions({
+            minDate: $('#startDate').val() ? $('#startDate').val() : false
+        });
+    }
 });
 
 $('#startTime').datetimepicker({
     datepicker: false,
-    format: 'H:i'
+    format: 'H:i',
+    onShow: function (ct) {
+        this.setOptions({
+            maxTime: $('#endTime').val() ? $('#endTime').val() : false
+        });
+    }
 });
 
 $('#endTime').datetimepicker({
     datepicker: false,
-    format: 'H:i'
+    format: 'H:i',
+    onShow: function (ct) {
+        this.setOptions({
+            minTime: $('#startTime').val() ? $('#startTime').val() : false
+        });
+    }
 });
