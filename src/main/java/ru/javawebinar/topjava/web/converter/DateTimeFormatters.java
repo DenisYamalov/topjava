@@ -1,7 +1,13 @@
 package ru.javawebinar.topjava.web.converter;
 
+import net.bytebuddy.implementation.bytecode.Throw;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.format.Formatter;
 
+import javax.validation.ConstraintViolationException;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -47,4 +53,13 @@ public class DateTimeFormatters {
             return ldt.format(DateTimeFormatter.ISO_DATE_TIME);
         }
     }
+
+    public static final class StringToInteger implements Converter<String, Integer> {
+
+        public Integer convert(String source) {
+//            return Integer.valueOf(source);
+            return source.isBlank() ? 0 : Integer.valueOf(source);
+        }
+    }
+
 }
