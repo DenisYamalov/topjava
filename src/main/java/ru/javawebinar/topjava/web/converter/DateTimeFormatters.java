@@ -53,11 +53,4 @@ public class DateTimeFormatters {
             return ldt.format(DateTimeFormatter.ISO_DATE_TIME);
         }
     }
-
-    public static final class StringToInteger implements Converter<String, Integer> {
-
-        public Integer convert(String source) {
-            return source.isBlank() ? null : Integer.valueOf(source);
-        }
-    }
 }
