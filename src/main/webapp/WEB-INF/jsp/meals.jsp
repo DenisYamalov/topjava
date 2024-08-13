@@ -114,9 +114,15 @@
 </div>
 <jsp:include page="fragments/footer.jsp"/>
 </body>
-<script type="text/javascript">
-    <jsp:include page="fragments/i118n.jsp"/>
-    sessionStorage.setItem("addTitle",'<spring:message code="meal.add"/>')
-    sessionStorage.setItem("editTitle",'<spring:message code="meal.edit"/>')
-</script>
+<c:set var="addTitle">
+    <spring:message code="meal.add"/>
+</c:set>
+<c:set var="editTitle">
+    <spring:message code="meal.edit"/>
+</c:set>
+
+<jsp:include page="fragments/i118n.jsp">
+    <jsp:param name="addTitle" value="${addTitle}"/>
+    <jsp:param name="editTitle" value="${editTitle}"/>
+</jsp:include>
 </html>
