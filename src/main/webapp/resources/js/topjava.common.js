@@ -23,10 +23,17 @@ function updateRow(id) {
     $("#modalTitle").html(i18n["editTitle"]);
     $.get(ctx.ajaxUrl + id, function (data) {
         $.each(data, function (key, value) {
+            if (key === "dateTime") {
+                value = stringifyDateTime(value);
+            }
             form.find("input[name='" + key + "']").val(value);
         });
         $('#editRow').modal();
     });
+}
+
+function stringifyDateTime(dateTime) {
+    return dateTime.replace(/T/g, ' ');
 }
 
 function deleteRow(id) {
@@ -49,12 +56,32 @@ function save() {
     $.ajax({
         type: "POST",
         url: ctx.ajaxUrl,
-        data: form.serialize()
+        data: findAndFormatDateTime(form)
     }).done(function () {
         $("#editRow").modal("hide");
         ctx.updateTable();
         successNoty("common.saved");
     });
+}
+
+function findAndFormatDateTime(form) {
+    let data = form.serializeArray();
+    data.find(function (dateTime) {
+        let formattedDateTime;
+        if (dateTime.name === "dateTime") {
+            formattedDateTime = formatDateTime(dateTime.value);
+            dateTime.value = formattedDateTime;
+            return dateTime;
+        }
+    });
+    console.log(data);
+    data = $.param(data);
+    console.log(data);
+    return data;
+}
+
+function formatDateTime(dateTime) {
+    return dateTime.replace(' ', 'T');
 }
 
 let failedNote;

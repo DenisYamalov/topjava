@@ -31,12 +31,7 @@ $(function () {
                     "data": "dateTime",
                     "render": function (dateTime, type, row) {
                         if (type === "display") {
-                            let d = new Date(dateTime);
-                            Number.prototype.padLeft = function (base, chr) {
-                                const len = (String(base || 10).length - String(this).length) + 1;
-                                return len > 0 ? new Array(len).join(chr || '0') + this : this;
-                            }
-                            return d.getFullYear() + "-" + (d.getMonth() + 1).padLeft() + "-" + d.getDate().padLeft() + " " + d.getHours() + ":" + d.getMinutes().padLeft();
+                            return stringifyDateTime(dateTime);
                         }
                         return dateTime;
                     }
@@ -72,7 +67,7 @@ $(function () {
 });
 
 $('#dateTime').datetimepicker({
-    format: 'Y-m-d\\TH:i',
+    format: 'Y-m-d H:i',
     validateOnBlur: false
 });
 
@@ -89,7 +84,7 @@ $('#startDate').datetimepicker({
 $('#endDate').datetimepicker({
     timepicker: false,
     format: 'Y-m-d',
-    onShow: function (ct){
+    onShow: function (ct) {
         this.setOptions({
             minDate: $('#startDate').val() ? $('#startDate').val() : false
         });
