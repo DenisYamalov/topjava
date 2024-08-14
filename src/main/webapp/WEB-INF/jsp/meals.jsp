@@ -114,8 +114,7 @@
 </div>
 <jsp:include page="fragments/footer.jsp"/>
 </body>
-<c:set var="page" value="meal"/>
 <jsp:include page="fragments/i118n.jsp">
-    <jsp:param name="page" value="${page}"/>
+    <jsp:param name="page" value="meal"/>
 </jsp:include>
 </html>
