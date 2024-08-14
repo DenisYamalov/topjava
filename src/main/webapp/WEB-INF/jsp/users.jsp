@@ -78,14 +78,8 @@
 </div>
 <jsp:include page="fragments/footer.jsp"/>
 </body>
-<c:set var="addTitle">
-    <spring:message code="user.add"/>
-</c:set>
-<c:set var="editTitle">
-    <spring:message code="user.edit"/>
-</c:set>
+<c:set var="page" value="user"/>
 <jsp:include page="fragments/i118n.jsp">
-    <jsp:param name="addTitle" value="${addTitle}"/>
-    <jsp:param name="editTitle" value="${editTitle}"/>
+    <jsp:param name="page" value="${page}"/>
 </jsp:include>
 </html>
