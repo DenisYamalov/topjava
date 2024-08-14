@@ -33,7 +33,7 @@ function updateRow(id) {
 }
 
 function stringifyDateTime(dateTime) {
-    return dateTime.replace(/T/g, ' ');
+    return dateTime.replace(/T/g, ' ').slice(0, -3);
 }
 
 function deleteRow(id) {
@@ -65,19 +65,8 @@ function save() {
 }
 
 function findAndFormatDateTime(form) {
-    let data = form.serializeArray();
-    data.find(function (dateTime) {
-        let formattedDateTime;
-        if (dateTime.name === "dateTime") {
-            formattedDateTime = formatDateTime(dateTime.value);
-            dateTime.value = formattedDateTime;
-            return dateTime;
-        }
-    });
-    console.log(data);
-    data = $.param(data);
-    console.log(data);
-    return data;
+    form.get(0).dateTime.value = formatDateTime(form.get(0).dateTime.value);
+    return form.serialize();
 }
 
 function formatDateTime(dateTime) {
