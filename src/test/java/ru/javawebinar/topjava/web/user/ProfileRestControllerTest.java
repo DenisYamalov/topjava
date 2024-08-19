@@ -27,7 +27,7 @@ class ProfileRestControllerTest extends AbstractControllerTest {
     @Test
     void get() throws Exception {
         perform(MockMvcRequestBuilders.get(REST_URL)
-                .with(userHttpBasic(user)))
+                        .with(userHttpBasic(user)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(USER_MATCHER.contentJson(user));
@@ -42,7 +42,7 @@ class ProfileRestControllerTest extends AbstractControllerTest {
     @Test
     void delete() throws Exception {
         perform(MockMvcRequestBuilders.delete(REST_URL)
-                .with(userHttpBasic(user)))
+                        .with(userHttpBasic(user)))
                 .andExpect(status().isNoContent());
         USER_MATCHER.assertMatch(userService.getAll(), admin, guest);
     }
@@ -52,8 +52,8 @@ class ProfileRestControllerTest extends AbstractControllerTest {
         UserTo newTo = new UserTo(null, "newName", "newemail@ya.ru", "newPassword", 1500);
         User newUser = UsersUtil.createNewFromTo(newTo);
         ResultActions action = perform(MockMvcRequestBuilders.post(REST_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonUtil.writeValue(newTo)))
+                                               .contentType(MediaType.APPLICATION_JSON)
+                                               .content(JsonUtil.writeValue(newTo)))
                 .andDo(print())
                 .andExpect(status().isCreated());
 
@@ -65,11 +65,22 @@ class ProfileRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    void registerNotValid() throws Exception {
+        UserTo newTo = new UserTo(null, "  ", "newemail", "newPassword", 1500);
+
+        perform(MockMvcRequestBuilders.post(REST_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(JsonUtil.writeValue(newTo)))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
     void update() throws Exception {
         UserTo updatedTo = new UserTo(null, "newName", "user@yandex.ru", "newPassword", 1500);
         perform(MockMvcRequestBuilders.put(REST_URL).contentType(MediaType.APPLICATION_JSON)
-                .with(userHttpBasic(user))
-                .content(JsonUtil.writeValue(updatedTo)))
+                        .with(userHttpBasic(user))
+                        .content(JsonUtil.writeValue(updatedTo)))
                 .andDo(print())
                 .andExpect(status().isNoContent());
 
@@ -77,10 +88,22 @@ class ProfileRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    void updateNotValid() throws Exception {
+        UserTo updatedTo = new UserTo(null, "  ", "user", "newPassword", 1500);
+        perform(MockMvcRequestBuilders.put(REST_URL).contentType(MediaType.APPLICATION_JSON)
+                        .with(userHttpBasic(user))
+                        .content(JsonUtil.writeValue(updatedTo)))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
+
+        USER_MATCHER.assertMatch(userService.get(USER_ID), user);
+    }
+
+    @Test
     void getWithMeals() throws Exception {
         assumeDataJpa();
         perform(MockMvcRequestBuilders.get(REST_URL + "/with-meals")
-                .with(userHttpBasic(user)))
+                        .with(userHttpBasic(user)))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
