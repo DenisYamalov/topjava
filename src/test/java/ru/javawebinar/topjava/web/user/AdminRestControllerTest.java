@@ -3,14 +3,18 @@ package ru.javawebinar.topjava.web.user;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.service.UserService;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -134,6 +138,20 @@ class AdminRestControllerTest extends AbstractControllerTest {
                         .with(userHttpBasic(admin))
                         .content(jsonWithPassword(newUser, newUser.getPassword())))
                 .andExpect(status().isUnprocessableEntity());
+    }
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    void createDuplicateMail() throws Exception {
+        User newAdmin = new User(null, "NewAdmin", "admin@gmail.com", "password", 2000, Role.ADMIN);
+        MvcResult mvcResult = perform(MockMvcRequestBuilders.post(REST_URL)
+                                              .contentType(MediaType.APPLICATION_JSON)
+                                              .with(userHttpBasic(admin))
+                                              .content(jsonWithPassword(newAdmin, newAdmin.getPassword())))
+                .andExpect(status().isConflict())
+                .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertThat(content).contains("User with this email already exists");
     }
 
     @Test

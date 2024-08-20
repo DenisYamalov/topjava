@@ -3,14 +3,21 @@ package ru.javawebinar.topjava.web.meal;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
+import java.time.Month;
+
+import static java.time.LocalDateTime.of;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -113,6 +120,22 @@ class MealRestControllerTest extends AbstractControllerTest {
                         .with(userHttpBasic(user))
                         .content(JsonUtil.writeValue(notValidMeal)))
                 .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    void createDuplicate() throws Exception {
+        Meal meal = new Meal(null, of(2020, Month.JANUARY, 30, 10, 0), "Завтрак второй", 500);
+        MvcResult mvcResult = perform(MockMvcRequestBuilders.post(REST_URL)
+                                              .contentType(MediaType.APPLICATION_JSON)
+                                              .with(userHttpBasic(user))
+                                              .content(JsonUtil.writeValue(meal)))
+                .andDo(print())
+                .andExpect(status().isConflict())
+                .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertThat(content).contains("Meal with this date and time already exists");
     }
 
     @Test
