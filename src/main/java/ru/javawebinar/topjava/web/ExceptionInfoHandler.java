@@ -22,6 +22,7 @@ import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 import static ru.javawebinar.topjava.util.exception.ErrorType.*;
 
@@ -32,6 +33,10 @@ public class ExceptionInfoHandler {
 
     @Autowired
     private MessageSource messageSource;
+
+    private static final List<String> CONSTRAINS_I18N_LIST = List.of(
+            "users_unique_email_idx",
+            "meal_unique_user_datetime_idx");
 
     //  http://stackoverflow.com/a/22358422/548473
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
@@ -46,9 +51,12 @@ public class ExceptionInfoHandler {
         String rootMsg = ValidationUtil.getRootCause(e).getMessage();
         if (rootMsg != null) {
             String lowerCaseMsg = rootMsg.toLowerCase();
-            if (lowerCaseMsg.contains("users_unique_email_idx")) {
-                return logAndGetErrorInfo(req, new Exception(messageSource.getMessage("user.users_unique_email_idx", null, req.getLocale())), true, VALIDATION_ERROR);
+            for (String constrain : CONSTRAINS_I18N_LIST) {
+                if (lowerCaseMsg.contains(constrain)) {
+                    return logAndGetErrorInfo(req, new Exception(messageSource.getMessage("app." + constrain, null, req.getLocale())), true, VALIDATION_ERROR);
+                }
             }
+
         }
         return logAndGetErrorInfo(req, e, true, DATA_ERROR);
     }
@@ -64,7 +72,7 @@ public class ExceptionInfoHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ErrorInfo validationConstraintError(HttpServletRequest req, MethodArgumentNotValidException e) {
         return new ErrorInfo(req.getRequestURL(), VALIDATION_ERROR,
-                             ValidationUtil.getFieldErrors(e.getBindingResult()));
+                ValidationUtil.getFieldErrors(e.getBindingResult()));
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
