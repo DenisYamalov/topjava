@@ -2,6 +2,8 @@ package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -28,6 +30,9 @@ import static ru.javawebinar.topjava.util.exception.ErrorType.*;
 public class ExceptionInfoHandler {
     private static final Logger log = LoggerFactory.getLogger(ExceptionInfoHandler.class);
 
+    @Autowired
+    private MessageSource messageSource;
+
     //  http://stackoverflow.com/a/22358422/548473
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ExceptionHandler(NotFoundException.class)
@@ -42,7 +47,7 @@ public class ExceptionInfoHandler {
         if (rootMsg != null) {
             String lowerCaseMsg = rootMsg.toLowerCase();
             if (lowerCaseMsg.contains("users_unique_email_idx")) {
-                return logAndGetErrorInfo(req, new Exception("User with this email already exists"), true, VALIDATION_ERROR);
+                return logAndGetErrorInfo(req, new Exception(messageSource.getMessage("user.users_unique_email_idx", null, req.getLocale())), true, VALIDATION_ERROR);
             }
         }
         return logAndGetErrorInfo(req, e, true, DATA_ERROR);
