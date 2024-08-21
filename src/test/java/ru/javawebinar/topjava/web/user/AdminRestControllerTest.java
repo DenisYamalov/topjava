@@ -109,6 +109,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(userHttpBasic(admin))
                         .content(jsonWithPassword(updated, updated.getPassword())))
+                .andDo(print())
                 .andExpect(status().isUnprocessableEntity());
 
         USER_MATCHER.assertMatch(userService.get(USER_ID), user);
@@ -137,6 +138,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(userHttpBasic(admin))
                         .content(jsonWithPassword(newUser, newUser.getPassword())))
+                .andDo(print())
                 .andExpect(status().isUnprocessableEntity());
     }
 
