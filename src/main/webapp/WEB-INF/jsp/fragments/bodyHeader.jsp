@@ -29,7 +29,7 @@
     </div>
     <div class="dropdown">
         <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
-            ru
+            ${pageContext.response.locale}
         </button>
         <div class="dropdown-menu">
             <a class="dropdown-item" href="?lang=en">English</a>

@@ -80,6 +80,5 @@
     <mvc:interceptors>
         <ref bean="localeChangeInterceptor"/>
         <bean class="ru.javawebinar.topjava.web.interceptor.ModelInterceptor"/>
-
     </mvc:interceptors>
 </beans>

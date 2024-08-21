@@ -139,6 +139,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
                         .content(jsonWithPassword(newUser, newUser.getPassword())))
                 .andExpect(status().isUnprocessableEntity());
     }
+
     @Test
     @Transactional(propagation = Propagation.NEVER)
     void createDuplicateMail() throws Exception {
