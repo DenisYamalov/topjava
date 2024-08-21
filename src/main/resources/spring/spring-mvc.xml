@@ -71,14 +71,16 @@
     </bean>
     <bean id="localeResolver"
           class="org.springframework.web.servlet.i18n.SessionLocaleResolver">
-        <property name="defaultLocale" value="ru" />
-    </bean>
-    <bean id="localeChangeInterceptor"
-          class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
-        <property name="paramName" value="lang" />
+        <property name="defaultLocale" value="ru"/>
     </bean>
     <mvc:interceptors>
-        <ref bean="localeChangeInterceptor"/>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean id="localeChangeInterceptor"
+                  class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+                <property name="paramName" value="lang"/>
+            </bean>
+        </mvc:interceptor>
         <bean class="ru.javawebinar.topjava.web.interceptor.ModelInterceptor"/>
     </mvc:interceptors>
 </beans>
