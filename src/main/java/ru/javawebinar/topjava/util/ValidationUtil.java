@@ -77,7 +77,7 @@ public class ValidationUtil {
 
     public static String getFieldErrors(BindingResult result) {
         return result.getFieldErrors().stream()
-                .map(fe -> String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
-                .collect(Collectors.joining("<br>"));
+                .map(fe -> String.format("%s: %s", fe.getField(), fe.getDefaultMessage()))
+                .collect(Collectors.joining(","));
     }
 }
