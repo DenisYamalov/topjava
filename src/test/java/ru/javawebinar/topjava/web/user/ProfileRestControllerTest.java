@@ -82,7 +82,7 @@ class ProfileRestControllerTest extends AbstractControllerTest {
     @Test
     @Transactional(propagation = Propagation.NEVER)
     void registerDuplicateEmail() throws Exception {
-        UserTo newTo = new UserTo(null, "NewUser", "user@yandex.ru", "newPassword", 1500);
+        UserTo newTo = new UserTo(null, "NewUser", user.getEmail(), "newPassword", 1500);
 
         MvcResult mvcResult = perform(MockMvcRequestBuilders.post(REST_URL)
                                               .contentType(MediaType.APPLICATION_JSON)

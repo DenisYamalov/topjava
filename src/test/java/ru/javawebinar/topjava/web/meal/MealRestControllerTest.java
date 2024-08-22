@@ -14,9 +14,6 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
-import java.time.Month;
-
-import static java.time.LocalDateTime.of;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -127,7 +124,7 @@ class MealRestControllerTest extends AbstractControllerTest {
     @Test
     @Transactional(propagation = Propagation.NEVER)
     void createDuplicate() throws Exception {
-        Meal meal = new Meal(null, of(2020, Month.JANUARY, 30, 10, 0), "Завтрак второй", 500);
+        Meal meal = new Meal(null, meal1.getDateTime(), "Завтрак второй", meal1.getCalories());
         MvcResult mvcResult = perform(MockMvcRequestBuilders.post(REST_URL)
                                               .contentType(MediaType.APPLICATION_JSON)
                                               .with(userHttpBasic(user))
