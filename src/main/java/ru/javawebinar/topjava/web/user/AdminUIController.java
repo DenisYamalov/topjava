@@ -1,10 +1,7 @@
 package ru.javawebinar.topjava.web.user;
 
-import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.to.UserTo;
@@ -37,13 +34,7 @@ public class AdminUIController extends AbstractUserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void createOrUpdate(@Valid UserTo userTo,
-                               BindingResult result) throws MethodArgumentNotValidException,
-                                                            NoSuchMethodException {
-        if (result.hasErrors()) {
-            throw new MethodArgumentNotValidException(new MethodParameter(this.getClass().getDeclaredMethod(
-                    "createOrUpdate", UserTo.class, BindingResult.class), 0), result);
-        }
+    public void createOrUpdate(@Valid UserTo userTo) {
         if (userTo.isNew()) {
             super.create(userTo);
         } else {

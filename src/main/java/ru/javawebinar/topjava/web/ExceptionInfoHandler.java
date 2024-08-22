@@ -9,7 +9,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,7 +53,9 @@ public class ExceptionInfoHandler {
             String lowerCaseMsg = rootMsg.toLowerCase();
             for (String constrain : CONSTRAINS_I18N_LIST) {
                 if (lowerCaseMsg.contains(constrain)) {
-                    return logAndGetErrorInfo(req, new Exception(messageSource.getMessage("app." + constrain, null, req.getLocale())), true, VALIDATION_ERROR);
+                    Exception validationException = new Exception(messageSource.getMessage("app." + constrain,
+                                                                                           null, req.getLocale()));
+                    return logAndGetErrorInfo(req, validationException, true, VALIDATION_ERROR);
                 }
             }
 
@@ -69,10 +71,10 @@ public class ExceptionInfoHandler {
     }
 
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ErrorInfo validationConstraintError(HttpServletRequest req, MethodArgumentNotValidException e) {
+    @ExceptionHandler(BindException.class)
+    public ErrorInfo validationConstraintError(HttpServletRequest req, BindException e) {
         return new ErrorInfo(req.getRequestURL(), VALIDATION_ERROR,
-                ValidationUtil.getFieldErrors(e.getBindingResult()));
+                             ValidationUtil.getFieldErrors(e.getBindingResult()));
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
