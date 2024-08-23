@@ -27,7 +27,7 @@
         <form-login login-page="/login" default-target-url="/meals"
                     authentication-failure-url="/login?error=true"
                     login-processing-url="/spring_security_check"/>
-        <logout logout-success-url="/login"/>
+        <logout logout-success-url="/login"  invalidate-session="false"/>
     </http>
 
     <authentication-manager>
