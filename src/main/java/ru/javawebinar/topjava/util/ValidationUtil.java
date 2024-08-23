@@ -9,7 +9,6 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.validation.*;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ValidationUtil {
 
@@ -77,7 +76,8 @@ public class ValidationUtil {
 
     public static String getFieldErrors(BindingResult result) {
         return result.getFieldErrors().stream()
-                .map(fe -> String.format("%s: %s", fe.getField(), fe.getDefaultMessage()))
-                .collect(Collectors.joining(","));
+                .map(fe -> String.format("\"%s: %s\"", fe.getField(), fe.getDefaultMessage()))
+//                .collect(Collectors.joining(","));
+                .toList().toString();
     }
 }
