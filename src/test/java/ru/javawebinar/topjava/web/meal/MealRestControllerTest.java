@@ -124,7 +124,7 @@ class MealRestControllerTest extends AbstractControllerTest {
     @Test
     @Transactional(propagation = Propagation.NEVER)
     void createDuplicate() throws Exception {
-        Meal meal = new Meal(null, meal1.getDateTime(), "Завтрак второй", meal1.getCalories());
+        Meal meal = new Meal(null, meal1.getDateTime(), "Завтрак второй", 500);
         MvcResult mvcResult = perform(MockMvcRequestBuilders.post(REST_URL)
                                               .contentType(MediaType.APPLICATION_JSON)
                                               .with(userHttpBasic(user))

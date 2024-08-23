@@ -145,7 +145,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
     @Test
     @Transactional(propagation = Propagation.NEVER)
     void createDuplicateMail() throws Exception {
-        User newAdmin = new User(null, "NewAdmin", admin.getEmail(), "password", admin.getCaloriesPerDay(), Role.ADMIN);
+        User newAdmin = new User(null, "NewAdmin", admin.getEmail(), "password", 2005, Role.ADMIN);
         MvcResult mvcResult = perform(MockMvcRequestBuilders.post(REST_URL)
                                               .contentType(MediaType.APPLICATION_JSON)
                                               .with(userHttpBasic(admin))
