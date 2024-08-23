@@ -1,8 +1,5 @@
 package ru.javawebinar.topjava.web.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -19,9 +16,6 @@ import javax.validation.Valid;
 @Controller
 @RequestMapping("/profile")
 public class ProfileUIController extends AbstractUserController {
-
-    @Autowired
-    private MessageSource messageSource;
 
     @GetMapping
     public String profile() {
@@ -56,7 +50,7 @@ public class ProfileUIController extends AbstractUserController {
             try {
                 super.create(userTo);
             } catch (DataIntegrityViolationException e) {
-                result.rejectValue("email", "error.user", messageSource.getMessage("app.users_unique_email_idx", null, LocaleContextHolder.getLocale()));
+                result.rejectValue("email", "app.users_unique_email_idx");
                 model.addAttribute("register", true);
                 return "profile";
             }
